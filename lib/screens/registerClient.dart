@@ -44,6 +44,7 @@ class _RegisterClientState extends State<RegisterClient> {
    String? selectionFrequence = 'Journalier';
     DateTime selectedDate = DateTime.now();
     TextEditingController _date = TextEditingController();
+    var _selected ="";
 
     Future<void> _selectDate(BuildContext context) async {
       final DateTime? picked = await showDatePicker(
@@ -57,6 +58,54 @@ class _RegisterClientState extends State<RegisterClient> {
         });
       }
     }
+
+    _displayDialog(BuildContext context) async {
+      _selected = await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return Expanded(
+              child: SimpleDialog(
+                title: Text('Option d\'ajout de la photo'),
+                children:[
+                  SimpleDialogOption(
+                    onPressed: () {
+                      Navigator.pop(context, "Pizza"); },
+                    child: Row(
+                      children: const [
+                        Icon(Icons.camera_alt_outlined),
+                        SizedBox(width: 20,),
+                        Text('Camera')
+                      ],
+                    )
+                  ),
+                  SimpleDialogOption(
+                    onPressed: () {
+                      Navigator.pop(context, "Burger");
+                    },
+                    child: Row(
+                      children: const [
+                        Icon(Icons.file_copy_outlined),
+                        SizedBox(width: 20,),
+                        Text('Galerie')
+                      ],
+                    ),
+                  ),
+                ],
+                elevation: 10,
+                //backgroundColor: Colors.green,
+              ),
+          );
+        },
+      );
+
+      if(_selected != null)
+      {
+        setState(() {
+          _selected = _selected;
+        });
+      }
+    }
+
     return Scaffold(
           // appBar: AppBar(
           //   backgroundColor: Colors.grey,
@@ -725,27 +774,15 @@ class _RegisterClientState extends State<RegisterClient> {
                                     child: TextButton(child: const Text('Ajouter une photo', style: TextStyle(
                                       fontSize: 18
                                     )), onPressed: (){
-                                      print('je suis');
-                                      AlertDialog(
-                                        title: Text('Reset settings?'),
-                                        content: Text('This will reset your device to its default factory settings.'),
-                                        actions: [
-                                          FlatButton(
-                                            textColor: Color(0xFF6200EE),
-                                            onPressed: () {},
-                                            child: Text('CANCEL'),
-                                          ),
-                                          FlatButton(
-                                            textColor: Color(0xFF6200EE),
-                                            onPressed: () {},
-                                            child: Text('ACCEPT'),
-                                          ),
-                                        ],
-                                      );
+                                      _displayDialog(context);
                                     },),
                                   ),
+
+
+
+
                                   Expanded(child: Container(
-                                    margin: EdgeInsets.only(right: 20),
+                                    margin: const EdgeInsets.only(right: 20),
                                     height: 140,
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(10),
@@ -807,5 +844,35 @@ class _RegisterClientState extends State<RegisterClient> {
               ),
         )
      ;
+  }
+}
+
+
+class SimpleDialogItem extends StatelessWidget {
+  const SimpleDialogItem(
+      {Key? key, required this.icon, required this.color, required this.text, required this.onPressed})
+      : super(key: key);
+
+  final IconData icon;
+  final Color color;
+  final String text;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return SimpleDialogOption(
+      onPressed: onPressed,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Icon(icon, size: 36.0, color: color),
+          Padding(
+            padding: const EdgeInsetsDirectional.only(start: 16.0),
+            child: Text(text),
+          ),
+        ],
+      ),
+    );
   }
 }

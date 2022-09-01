@@ -70,7 +70,7 @@ class _SouscriptionState extends State<Souscription> with SingleTickerProviderSt
                                 highlightColor: Colors.transparent,
                                 child: Container(
                                   padding: const EdgeInsets.all(10.0),
-                                  child: new Image.asset("assets/newIcons/ic_menu.png",width: 25,
+                                  child: Image.asset("assets/newIcons/ic_menu.png",width: 25,
                                     color: Theme.of(context).iconTheme.color,),
                                 ),
                               ),
@@ -107,7 +107,7 @@ class _SouscriptionState extends State<Souscription> with SingleTickerProviderSt
                           dragStartBehavior: DragStartBehavior.start,
                           labelPadding: EdgeInsets.symmetric(horizontal: 10.0),
                           indicator: BoxDecoration(
-                            borderRadius: BorderRadius.circular(50),
+                            borderRadius: BorderRadius.circular(20),
                           ),
                           //  isScrollable: true,
 
@@ -182,10 +182,10 @@ class _SouscriptionState extends State<Souscription> with SingleTickerProviderSt
           borderRadius: BorderRadius.circular(10),
           color: tb.index == index
               ? Colors.green
-              : Colors.grey
+              : Colors.white
       ),
       child: Text(title,
-        style: TextStyle(
+        style: const TextStyle(
           fontSize: 18,
           fontFamily: 'medium',
         ),),

@@ -15,19 +15,21 @@ class Historique extends StatefulWidget {
 class _HistoriqueState extends State<Historique> {
   final List<String> entries = <String>['PrTrans', 'DxTrans', 'TrTrans','PrTrans', 'DxTrans', 'TrTrans', 'PrTrans', 'DxTrans', 'TrTrans'];
   final List<int> colorCodes = <int>[600, 500, 100];
+  bool cliquer = false;
+  int elmtCliquer = -1;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white24,
+        backgroundColor: Colors.deepPurpleAccent,
         elevation: 0,
         title: Container(
           margin: const EdgeInsets.only(top: 20),
           child: const Center(
-            child:  Text('Historique', style: TextStyle(
+            child:  Text('Historique des transactions', style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: Colors.black
+                color: Colors.white
             ),),
           ),
         ),
@@ -48,32 +50,32 @@ class _HistoriqueState extends State<Historique> {
             margin: const EdgeInsets.symmetric(vertical: 10),
             padding: const EdgeInsets.symmetric(vertical: 5),
             width: MediaQuery.of(context).size.width,
-            height: 120,
+            height: 40,
             decoration: const BoxDecoration(
                 // color: Colors.grey,
                 // borderRadius: BorderRadius.circular(10)
             ),
             child: Column(
               children: [
-                Container(
-                  height: 70,
-                  width: 70,
-                  // padding: const EdgeInsets.symmetric(vertical: 30),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(100),
-                  ),
-                  child: const Image(image: AssetImage('assets/images/profile_photo.png', ),fit: BoxFit.fill,),
-                ),
-                const SizedBox(width: 20,),
-                Column(
-                  children: const [
-                    Text('Marc', style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold
-                    ),),
-                  ],
-                )
+                // Container(
+                //   height: 70,
+                //   width: 70,
+                //   // padding: const EdgeInsets.symmetric(vertical: 30),
+                //   decoration: BoxDecoration(
+                //     color: Colors.white,
+                //     borderRadius: BorderRadius.circular(100),
+                //   ),
+                //   child: const Image(image: AssetImage('assets/images/profile_photo.png', ),fit: BoxFit.fill,),
+                // ),
+                // const SizedBox(width: 20,),
+                // Column(
+                //   children: const [
+                //     Text('Marc', style: TextStyle(
+                //         fontSize: 18,
+                //         fontWeight: FontWeight.bold
+                //     ),),
+                //   ],
+                // )
               ],
             ),),
           Expanded(child: ListView.separated(
@@ -103,7 +105,7 @@ class _HistoriqueState extends State<Historique> {
                           ),
                         ),
                         Text('01/09/2022', style: GoogleFonts.sacramento(
-                            fontSize: 32,
+                            fontSize: 14,
                             fontWeight: FontWeight.w700,
                             fontStyle: FontStyle.italic,
                             color: Colors.black
@@ -121,12 +123,32 @@ class _HistoriqueState extends State<Historique> {
                           margin: const EdgeInsets.only(right: 70),
                             child: Text(entries[index])),
                         TextButton(onPressed: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => DetailTransaaction()));
+                          // Navigator.push(context, MaterialPageRoute(builder: (context) => DetailTransaaction()));
+
+                          setState(() {
+                            cliquer = !cliquer;
+                            elmtCliquer = index;
+                          });
                         },
                         child: const Text('Voir plus'),)
                       ]
                   ),
-                ))]);}, separatorBuilder: (BuildContext context, int index) {return Divider(
+
+                )),
+                  if(cliquer == true && elmtCliquer==index)
+                  Container(
+                    height: 100,
+                    color: Colors.white,
+                    child: Column(
+                      children: [
+                        Text('text1' + entries[index]),
+                        Text('text2' + entries[index]),
+                        Text('text3' + entries[index]),
+                        Text('text4' + entries[index]),
+                      ],
+                    ),
+
+                  )]);}, separatorBuilder: (BuildContext context, int index) {return Divider(
             color: Theme.of(context).dividerColor,
           ); },)
 

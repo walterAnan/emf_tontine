@@ -162,11 +162,16 @@ class _ClientsState extends State<Clients> {
 
               },
               separatorBuilder: (BuildContext context, int index) => const Divider()
-              ),)
-
+              ),
+          ),
+          const SizedBox(height: 70,)
         ],
+
       ),
-      floatingActionButton: FloatingActionButton(
+
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 50.0),
+        child:FloatingActionButton(
         onPressed: () {
           Navigator.push(
               context,
@@ -175,6 +180,6 @@ class _ClientsState extends State<Clients> {
         child: Icon(Icons.add),
         backgroundColor: Colors.green,
       ),
-    );
+    ));
   }
 }

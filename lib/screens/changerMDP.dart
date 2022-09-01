@@ -17,7 +17,7 @@ class _ChangerMDPState extends State<ChangerMDP> {
       body: Center(
         child: SingleChildScrollView(
           child: Container(
-            margin: EdgeInsets.symmetric(horizontal: 50, vertical: 50),
+            margin: const EdgeInsets.symmetric(horizontal: 50, vertical: 50),
             width: MediaQuery.of(context).size.width,
             height: 450,
             decoration: BoxDecoration(
@@ -27,8 +27,8 @@ class _ChangerMDPState extends State<ChangerMDP> {
               child: Column(
                 children: [
                   Container(
-                    margin: EdgeInsets.symmetric(vertical: 25),
-                    child: Text('Changez votre mot de passe !', style: TextStyle(
+                    margin: const EdgeInsets.symmetric(vertical: 25),
+                    child: const Text('Changez votre mot de passe !', style: TextStyle(
                         fontSize:18
                     ),),
                   ),
