@@ -39,9 +39,33 @@ dependencies:
   flutter_cupertino_date_picker_fork: ^1.0.6
   flutter_vector_icons: ^1.0.0
   image_picker: ^0.8.5+3
+  flutter_svg: ^1.1.5
+  intl: ^0.16.1
+  charts_flutter:
+  dropdown_formfield:
+  font_awesome_flutter:
+  path:
+  ionicons:
+  sqflite:
   page_transition:
-  qr_code_scanner:
   simple_animations:
+  flutter_unique_device_id: ^0.0.1
+  http: ^0.13.5
+  fluttertoast: ^8.1.1
+  connectivity_plus: ^3.0.2
+  flutter_barcode_scanner: ^2.0.0
+  awesome_dropdown: ^0.0.4
+  shared_preferences: ^2.0.15
+  dio: ^4.0.6
+  flutter_flavor: ^3.1.1
+  shimmer: ^2.0.0
+  json_annotation: ^4.7.0
+
+
+
+
+
+
 
 dev_dependencies:
   flutter_test:
@@ -53,6 +77,8 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^1.0.0
+  build_runner: ^2.3.2
+  json_serializable: ^6.5.4
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
