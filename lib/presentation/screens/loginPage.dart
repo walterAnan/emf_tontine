@@ -8,13 +8,14 @@ import 'package:emf_tontine/presentation/screens/bottom.dart';
 import 'package:emf_tontine/presentation/utils/constant.dart';
 import 'package:emf_tontine/presentation/utils/keycloak_auth.dart';
 import 'package:emf_tontine/presentation/widgets/functions.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_unique_device_id/flutter_unique_device_id.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:http/http.dart' as http;
+import 'package:imei_plugin/imei_plugin.dart';
 
 
 
@@ -29,11 +30,44 @@ class _LoginPageState extends State<LoginPage> {
 
   var token = 'default';
   bool _isloading = false;
+  bool _passwordVisible = false;
    ConnectivityResult _connectionStatus = ConnectivityResult.none;
   final Connectivity _connectivity = Connectivity();
   late StreamSubscription<ConnectivityResult> _connectivitySubscription;
 
   var lien = Dev_constante().dev;
+  String _platformImei = 'Unknown';
+  String uniqueId = "Unknown";
+
+
+
+  Future<void> initPlatformState() async {
+    String platformImei;
+    String idunique = '';
+    // Platform messages may fail, so we use a try/catch PlatformException.
+    try {
+      platformImei =
+      await ImeiPlugin.getImei(shouldShowRequestPermissionRationale: false);
+      List<String> multiImei = await ImeiPlugin.getImeiMulti();
+      print(multiImei);
+      idunique = await ImeiPlugin.getId();
+      print('le dernier package: $multiImei et $idunique');
+    } on PlatformException {
+      platformImei = 'Failed to get platform version.';
+    }
+
+    // If the widget was removed from the tree while the asynchronous platform
+    // message was in flight, we want to discard the reply rather than calling
+    // setState to update our non-existent appearance.
+    if (!mounted) return;
+
+    setState(() {
+      _platformImei = platformImei;
+      uniqueId = idunique;
+    });
+  }
+
+
 
 
   @override
@@ -50,8 +84,8 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
-  TextEditingController codeSecret = new TextEditingController();
-  TextEditingController mdp = new TextEditingController();
+  TextEditingController codeSecret = TextEditingController();
+  TextEditingController mdp = TextEditingController();
    String lien_civilite = '$lienDev''referentiels/civilites';
   void authentif(String id_app, String code, String mdp) async {
     var queryResponse = await http.post(Uri.parse('https://dev-cashdelivery.ventis.group/api/apareil_auth'),
@@ -65,7 +99,7 @@ class _LoginPageState extends State<LoginPage> {
         'code': mdp,
       }),
     ).catchError((onError){
-      showErrorToast(this.context, 'Vérifiez votre Connexion Internet ');
+      showErrorToast(context, 'Vérifiez votre Connexion Internet ');
     });
 
     if(queryResponse!=null && queryResponse.statusCode==200) {
@@ -114,29 +148,62 @@ class _LoginPageState extends State<LoginPage> {
         body: Column(
           children: [
             Container(
-              height: 70,
+              height: 50,
               color: const Color(0xff4a9e04),
             ),
-        Container(
-        height: 150,
+        SizedBox(height: 30,),
+        SizedBox(
+        height: 45,
       // color: Colors.green,
-              child: SvgPicture.asset(
-                'assets/images/logo-sfe.svg', height: 50,
-                color: const Color(0xff4a9e04),),
+              child: Container(
+                child: SvgPicture.asset(
+                  'assets/images/logo-sfe.svg', height: 45,
+                  color: const Color(0xff4a9e04),),
+              ),
             ),
-        Text('EMF-TONTINE',
-            style: GoogleFonts.acme(
+
+            SizedBox(height: 10,),
+        // Container(
+        //   alignment:  Alignment.topRight,
+        //   margin: EdgeInsets.only(right: 50),
+        //   child: Text('EMF-TONTINE',
+        //       style: GoogleFonts.acme(
+        //           textStyle: const TextStyle(color: Colors.green,
+        //               fontSize: 16,
+        //               fontWeight: FontWeight.bold)
+        //       )),
+        // ),
+
+        Column(
+          children: [
+            Center(child:
+            Container(
+                height: 80,
+                width: 80,
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade200,
+                    border: Border.all(color: Colors.grey.shade200),
+                  borderRadius: BorderRadius.circular(100)
+                ),
+                child: Icon(Icons.person_outline_outlined, color: Colors.black.withOpacity(0.5), size: 78,))),
+          ],
+        ),
+
+            const SizedBox(height: 15,),
+            Text('Bienvenue sur emf-tontine',
+            style: GoogleFonts.handlee(
             textStyle: const TextStyle(color: Colors.black,
-            fontSize: 26,
+            fontSize: 23,
             fontWeight: FontWeight.bold)
             )),
 
-            Text('Page de Connexion',
-            style: GoogleFonts.handlee(
-            textStyle: const TextStyle(color: Colors.black,
-            fontSize: 28,
-            fontWeight: FontWeight.bold)
-            )),
+            Text('Connectez-vous pour continuer',
+                style: GoogleFonts.handlee(
+                    textStyle: const TextStyle(color: Colors.green,
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold)
+                )),
+
 
             const SizedBox(height: 20,),
             Expanded(
@@ -147,64 +214,139 @@ class _LoginPageState extends State<LoginPage> {
                    key: _formkey,
                   child: Column(
                     children: [
-                      TextFormField(
-                        decoration: const InputDecoration(
-                          labelText: "Code agent",
-                          prefixIcon: Icon(
-                            Icons.person_outline_rounded,
-                            color: Colors.grey,
+                  Container(
+                  padding: const EdgeInsets.fromLTRB(10,1,10,1),
+                   decoration: BoxDecoration(
+                       borderRadius: BorderRadius.circular(5),
+                       border: Border.all(color: const Color(0xff4a9e04))
+                   ),
+                        child: TextFormField(
+                          style: const TextStyle(
+                              color: Color(0xff4a9e04), fontWeight: FontWeight.w400,
+                              fontSize: 18
                           ),
-                        ),
-
-                        validator: (email) {
-                          if (validationCode(email!)) return null;
-                          else {
-                            return 'Entrer une addresse mail valide';
-                          }
-                        },
-                      ),
-                      const SizedBox(height: 20),
-                      TextFormField(
-                        decoration: const InputDecoration(
-                          labelText: "Mot de passe",
-                          prefixIcon: Icon(
-                            Icons.lock,
-                            color: Colors.grey,
-                          ),
-                        ),
-                        obscureText: isChecked == true ? false : true,
-                        validator: (password) {
-                          if (validationMdp(password!)) return null;
-                          else {
-                            return 'Entrer un mot de passe valide';
-                          }
-                        },
-                      ),
-                      const SizedBox(height: 20,),
-
-                      Row(
-                        children: [
-                          Container(
-                            color: Colors.white,
-                            child: Checkbox(
-                              value: isChecked,
-                              onChanged: (bool? value) {
-                                setState(() {
-                                  isChecked = value!;
-                                });
-                              },
+                          decoration: const InputDecoration(
+                            labelText: "Code agent",
+                            border: InputBorder.none,
+                            prefixIcon: Icon(
+                              Icons.person_outline_rounded,
+                              color: Colors.black,
                             ),
                           ),
-                          const Text('mot de passe visible!', style: TextStyle(
-                              fontSize: 18
-                          ),)
-                        ],
+
+                          validator: (email) {
+                            if (validationCode(email!)) return null;
+                            else {
+                              return 'Entrer une addresse mail valide';
+                            }
+                          },
+                        ),
                       ),
-                      const SizedBox(height: 10,),
+                      const SizedBox(height: 20),
+                      Container(
+                        padding: const EdgeInsets.fromLTRB(10,2,10,2),
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(5),
+                            border: Border.all(color: const Color(0xff4a9e04))
+                        ),
+                        // child: TextFormField(
+                        //   style: const TextStyle(
+                        //     color: Colors.black, fontWeight: FontWeight.w500,
+                        //     fontSize: 18
+                        //   ),
+                        //   decoration: const InputDecoration(
+                        //     labelText: "Mot de passe",
+                        //     border: InputBorder.none,
+                        //     prefixIcon: Icon(
+                        //       Icons.lock,
+                        //       color: Colors.black,
+                        //     ),
+                        //   ),
+                        //   obscureText: isChecked == true ? false : true,
+                        //   validator: (password) {
+                        //     if (validationMdp(password!)) return null;
+                        //     else {
+                        //       return 'Entrer un mot de passe valide';
+                        //     }
+                        //   },
+                        // ),
+
+                        child: TextFormField(
+                          obscureText: !_passwordVisible,
+                          style: const TextStyle(
+                              color: Color(0xff4a9e04), fontWeight: FontWeight.w400,
+                              fontSize: 18
+                          ),
+                          decoration: InputDecoration(
+                            filled: true,
+                            border: InputBorder.none,
+                            prefixIcon: const Icon(Icons.lock, color: Colors.black,),
+                            fillColor: Colors.white.withOpacity(0.5),
+                            labelText: "Password",
+                            suffixIcon: GestureDetector(
+                              onLongPress: () {
+                                setState(() {
+                                  _passwordVisible = true;
+                                });
+                              },
+                              onLongPressUp: () {
+                                setState(() {
+                                  _passwordVisible = false;
+                                });
+                              },
+                              child: Icon(
+                                  _passwordVisible ? Icons.visibility : Icons.visibility_off, color: Colors.black,),
+                            ), floatingLabelBehavior: FloatingLabelBehavior.auto,
+                          ),
+                          validator: (value) {
+                            if (value!.isEmpty) {
+                              return "*Inserer le mot de passe";
+                            }
+                          },
+                          onSaved: (value) {
+                            // _setPassword(value);
+                          },
+                        ),
+
+                      ),
+
+                      const SizedBox(height: 40),
+                      Container(
+                        alignment: Alignment.bottomRight,
+                        child: const InkWell(
+                          child: Text('Mot de passe oublié ?', style: TextStyle(
+                              color: Color(0xff4a9e04),
+                              fontSize: 18
+                          ),),
+                        ),
+                      ),
+
+                      const SizedBox(height: 20,),
+
+                      // Row(
+                      //   children: [
+                      //     Container(
+                      //       color: Colors.white,
+                      //       child: Checkbox(
+                      //         value: isChecked,
+                      //         onChanged: (bool? value) {
+                      //           setState(() {
+                      //             isChecked = value!;
+                      //           });
+                      //         },
+                      //       ),
+                      //     ),
+                      //     const Text('mot de passe visible!', style: TextStyle(
+                      //         fontSize: 20,
+                      //       fontWeight: FontWeight.w500
+                      //     ),)
+                      //   ],
+                      // ),
+                      const SizedBox(height: 20,),
                       ElevatedButton(
-                        child: _isloading? const CircularProgressIndicator(color: Colors.white,): const Text('Connecter'),
+                        child: _isloading? const CircularProgressIndicator(color: Colors.white,): const Text('Connexion'),
                         onPressed: () async {
-                            // fetchClientPhysique();
+                            fetchClientPhysique();
                           if(_formkey.currentState!.validate()){
                             setState(() {
                               _isloading = true;
@@ -227,11 +369,10 @@ class _LoginPageState extends State<LoginPage> {
                             print('aprés le token retourne: $token3');
                             print('lien: $lien_civilite');
                             _isloading = false;
-                            Navigator.push(
+                            initPlatformState();
+                            Navigator.pushReplacement(
                               context,
-                              MaterialPageRoute(builder: (
-
-                                  context) => const Bottom()),
+                              MaterialPageRoute(builder: (context) => const Bottom()),
                             );
                           }
 
@@ -247,20 +388,16 @@ class _LoginPageState extends State<LoginPage> {
                         },
                         style: ElevatedButton.styleFrom(
                             primary: const Color(0xff4a9e04),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12.0),
+                            ),
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 70, vertical: 10),
-                            textStyle:
-                            const TextStyle(
+                            textStyle: const TextStyle(
                                 fontSize: 25, fontWeight: FontWeight.bold)),
                       ),
-                      const SizedBox(height: 40),
-                      const InkWell(
-                        child: Text('mot de passe oublié ?', style: TextStyle(
-                            color: Color(0xff4a9e04),
-                            fontSize: 18
-                        ),),
-                      ),
-                      const SizedBox(height: 30,),
+
+                      const SizedBox(height: 100,),
                     ],
                   ),
               ),
@@ -272,21 +409,24 @@ class _LoginPageState extends State<LoginPage> {
 
 
 
-  Future<String>initPlatformState() async {
-    String uniqueDeviceId;
-    // Platform messages may fail, so we use a try/catch PlatformException.
-    try {
-      uniqueDeviceId = await UniqueDeviceId.get;
-    } on PlatformException {
-      uniqueDeviceId = 'Failed to get platform version.';
-    }
+  // Future<String>initPlatformState() async {
+  //   String uniqueDeviceId;
+  //   // Platform messages may fail, so we use a try/catch PlatformException.
+  //   try {
+  //     uniqueDeviceId = await UniqueDeviceId.get;
+  //     print('je suis l\'identifiant unique: $uniqueDeviceId');
+  //   } on PlatformException {
+  //     uniqueDeviceId = 'Failed to get platform version.';
+  //   }
+  //
+  //   // If the widget was removed from the tree while the asynchronous platform
+  //   // message was in flight, we want to discard the reply rather than calling
+  //   // setState to update our non-existent appearance.
+  //
+  //   return uniqueDeviceId;
+  // }
 
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
 
-    return uniqueDeviceId;
-  }
   Future<void> initConnectivity() async {
     late ConnectivityResult result;
     // Platform messages may fail, so we use a try/catch PlatformException.

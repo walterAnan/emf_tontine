@@ -49,17 +49,23 @@ dependencies:
   sqflite:
   page_transition:
   simple_animations:
-  flutter_unique_device_id: ^0.0.1
   http: ^0.13.5
   fluttertoast: ^8.1.1
   connectivity_plus: ^3.0.2
   flutter_barcode_scanner: ^2.0.0
   awesome_dropdown: ^0.0.4
   shared_preferences: ^2.0.15
-  dio: ^4.0.6
   flutter_flavor: ^3.1.1
   shimmer: ^2.0.0
   json_annotation: ^4.7.0
+  dropdown_button2: ^1.9.2
+  getwidget: ^3.0.1
+  flutter_easyloading: ^3.0.5
+  intl_phone_number_input: ^0.7.2
+  awesome_dialog: ^3.0.2
+  imei_plugin: ^1.2.0
+
+
 
 
 
@@ -77,8 +83,8 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^1.0.0
+  json_serializable: ^6.6.0
   build_runner: ^2.3.2
-  json_serializable: ^6.5.4
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

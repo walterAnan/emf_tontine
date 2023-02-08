@@ -1,6 +1,8 @@
 import 'package:awesome_dropdown/awesome_dropdown.dart';
+import 'package:emf_tontine/data/apiProviders/dataApi.dart';
 import 'package:emf_tontine/presentation/screens/collecter.dart';
 import 'package:flutter/material.dart';
+import 'package:getwidget/components/dropdown/gf_dropdown.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 
@@ -15,18 +17,35 @@ class ProfileClient extends StatefulWidget {
 class _ProfileClientState extends State<ProfileClient> {
   TextEditingController montant = TextEditingController();
   bool _validate = false;
+  bool isLoading = true;
   late String dropdown;
   bool _isBackPressedOrTouchedOutSide = false,
       _isDropDownOpened = false,
       _isPanDown = false;
-  late List<String> _list = ["Abc", "DEF", "GHI", "JKL", "MNO", "PQR"];
-  String _selectedItem = '';
+  late List<dynamic> _list = [];
+  dynamic _selectedItem;
   Map data = {};
+
+  getDataProduit() async {
+    List<dynamic> list = await getProdriut();
+    if(list != null){
+      for(int i = 0; i< list.length; i++){
+        _list.add(list[i]);
+        print(_list[i]['code']);
+        setState(() {
+          isLoading = false;
+        });
+      }
+    }else{
+      print('Le retour est nul');
+    }
+
+
+  }
 
   @override
   void initState() {
-    _list = ["Abc", "DEF", "GHI", "JKL", "MNO", "PQR"];
-    _selectedItem = 'Select Item';
+    getDataProduit();
     super.initState();
   }
   @override
@@ -171,26 +190,32 @@ class _ProfileClientState extends State<ProfileClient> {
 
                   ),
 
-                SizedBox(
-                  height: 70,
-                  child: AwesomeDropDown(
-                    isPanDown: _isPanDown,
-                    dropDownBorderRadius: 20,
-                    dropDownBottomBorderRadius: 20,
-                    dropDownTopBorderRadius: 20,
-                    dropDownList: _list,
-                    isBackPressedOrTouchedOutSide: _isBackPressedOrTouchedOutSide,
-                    selectedItem: _selectedItem,
-                    onDropDownItemClick: (selectedItem) {
-                      _selectedItem = selectedItem;
-                      data['produit'] = _selectedItem;
-                    },
-                    dropStateChanged: (isOpened) {
-                      _isDropDownOpened = isOpened;
-                      if (!isOpened) {
-                        _isBackPressedOrTouchedOutSide = false;
-                      }
-                    },
+                Container(
+                  height: 50,
+                  width: MediaQuery.of(context).size.width,
+                  margin: const EdgeInsets.all(10),
+                  child: DropdownButtonHideUnderline(
+                    child: GFDropdown(
+                      hint: const Text('choisir un produit'),
+                      padding: const EdgeInsets.only(left: 15, right: 5),
+                      borderRadius: BorderRadius.circular(10),
+                      border: const BorderSide(
+                          color: Colors.black12, width: 1),
+                      dropdownButtonColor: Colors.grey[100],
+                      value: _selectedItem,
+                      onChanged: (newValue) {
+                        setState(() {
+                          _selectedItem = newValue;
+                          data['produit'] = _selectedItem;
+                        });
+                      },
+                      items:_list
+                          .map((value) => DropdownMenuItem(
+                        value: value,
+                        child: Text(value['nomProduit']),
+                      ))
+                          .toList(),
+                    ),
                   ),
                 ),
                 const SizedBox(height: 30,),

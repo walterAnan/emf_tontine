@@ -107,29 +107,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
           ),
           Container(
-            height: height*0.20,
+            height: height*0.22,
             color: Colors.grey.shade100,
             child: Column(
               children: [
                 Center(
                   child: Stack(
                     children: [
-                      // SizedBox(
-                      //       height: 80,
-                      //       width: 80,
-                      //   child: Container(
-                      //     // margin: const EdgeInsets.only(top: 40, right: 20),
-                      //     height: 80,
-                      //     width: 80,
-                      //     decoration: BoxDecoration(
-                      //       color: Colors.grey.shade200,
-                      //       borderRadius: BorderRadius.circular(100),
-                      //     ),
-                      //     // child: const Image(image: AssetImage('assets/images/profile_photo.png'),),
-                      //
-                      //     child: (_image == null)? Image(image: AssetImage('assets/images/profile_photo.png'),):Image(image: FileImage(File(_image.path))),
-                      //   ),
-                      // ),
 
                     Container(
                       padding: const EdgeInsets.all(4),
@@ -213,7 +197,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   child: Container(
                     margin: const EdgeInsets.only(top: 2,),
                     child: Text('marc@gmail.com', style:GoogleFonts.hanuman(
-                        fontSize: 16,
+                        fontSize: 12,
                         fontWeight: FontWeight.w300,
                         fontStyle: FontStyle.italic,
                         color: Colors.black

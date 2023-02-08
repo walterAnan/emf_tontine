@@ -2,7 +2,6 @@
 import 'package:emf_tontine/presentation/screens/dashboard.dart';
 import 'package:emf_tontine/presentation/screens/profile.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'clients.dart';
 class Bottom extends StatefulWidget {
@@ -53,7 +52,7 @@ class _BottomState extends State<Bottom> {
 
         ],
         currentIndex: _selectedIndex,
-        selectedItemColor: Color(0xff4a9e04),
+        selectedItemColor: const Color(0xff4a9e04),
         onTap: _onItemTapped,
       ),
     );

@@ -1,4 +1,6 @@
 
+import 'package:emf_tontine/data/apiProviders/dataApi.dart';
+import 'package:emf_tontine/data/models/client_particulier.dart';
 import 'package:emf_tontine/presentation/screens/profileClients.dart';
 import 'package:emf_tontine/presentation/screens/scanne.dart';
 import 'package:emf_tontine/presentation/screens/souscrire.dart';
@@ -15,47 +17,50 @@ class Clients extends StatefulWidget {
 }
 
 class _ClientsState extends State<Clients> {
-  // List<String> _entries = <String>['Premier Client', 'Deuxième Client', 'Troisième Client','Premier Client', 'Deuxième Client', 'Troisième Client', 'Premier Client', 'Deuxième Client', 'Troisième Client', 'Premier Client', 'Deuxième Client', 'Troisième Client'];
-  // List<String> _clientTrouve = <String>[];
   final List<int> colorCodes = <int>[600, 500, 100];
   TextEditingController text = TextEditingController();
   bool affiche = false;
+  bool isLoading = true;
   int elmt = -1;
 
+  final List<dynamic> _mesclients = [];
 
-  final List<Map<String, dynamic>> _clients = [
-  {"id": 1, "name": "Andy", "age": 29},
-  {"id": 2, "name": "Aragon", "age": 40},
-  {"id": 3, "name": "Bob", "age": 5},
-  {"id": 4, "name": "Barbara", "age": 35},
-  {"id": 5, "name": "Candy", "age": 21},
-  {"id": 6, "name": "Colin", "age": 55},
-  {"id": 7, "name": "Audra", "age": 30},
-  {"id": 8, "name": "Banana", "age": 14},
-  {"id": 9, "name": "Caversky", "age": 100},
-  {"id": 10, "name": "Becky", "age": 32},
-  ];
 
-  // This list holds the data for the list view
-  List<Map<String, dynamic>> _clientTrouve = [];
-  @override
-  initState() {
 
-    _clientTrouve = _clients;
-    super.initState();
+  getPersonnes() async {
+    List<dynamic> list = await getClientParticulier();
+    if(list != null){
+      for(int i = 0; i< list.length; i++){
+        print(list[i]);
+        _mesclients.add(list[i]);
+      }
+      setState(() {
+        isLoading = false;
+      });
+    }else{
+      print('Le retour est nul');
+    }
+
   }
 
+  List<dynamic> _clientTrouve = [];
+  @override
+  initState() {
+    getPersonnes();
+    _clientTrouve = _mesclients;
+    super.initState();
+  }
   // This function is called whenever the text field changes
   void _runFilter(String entree) {
-    List<Map<String, dynamic>> results = [];
+    List<dynamic> results = [];
     if (entree.isEmpty) {
       // if the search field is empty or only contains white-space, we'll display all users
-      results = _clients;
+      results = _mesclients;
       print('je suis dans le if $results');
     } else {
-      results = _clients
+      results = _mesclients
           .where((user) =>
-          user["name"].toLowerCase().contains(entree.toLowerCase()))
+          user["personne"]['nomComplet'].toLowerCase().contains(entree.toLowerCase()))
           .toList();
       // we use the toLowerCase() method to make it case-insensitive
     }
@@ -111,12 +116,16 @@ class _ClientsState extends State<Clients> {
         elevation: 0,
         title: Container(
           margin: const EdgeInsets.only(top: 30),
-          child: Text('La Liste des Clients', style: GoogleFonts.sacramento(
-              fontSize: 32,
-              fontWeight: FontWeight.w700,
-              fontStyle: FontStyle.italic,
-               color: Colors.black
-            )
+          child: Column(
+            children: [
+              Text('La Liste des Clients', style: GoogleFonts.acme(
+                  fontSize: 28,
+                  fontWeight: FontWeight.w700,
+                   color: Colors.white
+                )
+              ),
+              Container(height: 20,)
+            ],
           ),
         ),
         actions: const [
@@ -130,7 +139,8 @@ class _ClientsState extends State<Clients> {
 
         ],
       ),
-      body: Column(
+      body: isLoading ? const Center(child: CircularProgressIndicator()):
+      Column(
         children: [
           const SizedBox(height: 10,),
           SizedBox(
@@ -197,8 +207,8 @@ class _ClientsState extends State<Clients> {
                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 // const Text('Marc', style: TextStyle(fontWeight: FontWeight.w700),),
-                                Center(child: Text(_clientTrouve[index]['name'].toString())),
-                                Text(_clientTrouve[index]['age'].toString(), style: const TextStyle(fontWeight: FontWeight.w700),),
+                                Center(child: Text(_clientTrouve[index]['personne']['nomComplet'].toString())),
+                                Text(_clientTrouve[index]['personne']['adresse']['telephone'].toString(), style: const TextStyle(fontWeight: FontWeight.w700),),
                               ],
                             ),
                           )
@@ -233,7 +243,7 @@ class _ClientsState extends State<Clients> {
                               setState(() {
                                 affiche = !affiche;
                                 Navigator.push(context, MaterialPageRoute(builder: (context) => const ProfileClient(),
-                                    settings: RouteSettings(arguments: _clientTrouve[index]['name'])));
+                                    settings: RouteSettings(arguments: _clientTrouve[index]['personne']['nomComplet'])));
                               });
 
                             },
@@ -251,7 +261,7 @@ class _ClientsState extends State<Clients> {
                                 affiche = !affiche;
                               });
                               Navigator.push(context, MaterialPageRoute(builder: (context) => const Souscrire(),
-                                  settings: RouteSettings(arguments: _clients[index]['name'])));
+                                  settings: RouteSettings(arguments: _mesclients[index]['personne']['nomComplet'])));
                             },
                           ),
 
@@ -269,7 +279,7 @@ class _ClientsState extends State<Clients> {
                                 affiche = !affiche;
                               });
                               Navigator.push(context, MaterialPageRoute(builder: (context) => const DetailsClients(),
-                                  settings: RouteSettings(arguments: _clients[index]['name'])));
+                                  settings: RouteSettings(arguments: _mesclients[index]['personne']['nomComplet'])));
                             },
                           )
                         ],

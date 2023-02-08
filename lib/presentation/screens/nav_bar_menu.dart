@@ -3,6 +3,7 @@ import 'package:emf_tontine/presentation/screens/changerMDP.dart';
 import 'package:emf_tontine/presentation/screens/clients.dart';
 import 'package:emf_tontine/presentation/screens/historique.dart';
 import 'package:emf_tontine/presentation/screens/loginPage.dart';
+import 'package:emf_tontine/presentation/screens/mes_produits.dart';
 import 'package:emf_tontine/presentation/screens/profile.dart';
 import 'package:emf_tontine/presentation/screens/registerClient.dart';
 import 'package:flutter/material.dart';
@@ -121,316 +122,354 @@ class _MyDrawerState extends State<MyDrawer> {
               ),
               const SizedBox(height: 10,),
               //items
-              Container(
-                child: Column(
-                  children: [
-                    //Home
-                    InkWell(
-                      onTap: (){
-                        if(title=="Home"){
-                          Navigator.pop(context);
-                        }else {
-                          // Navigator.pushAndRemoveUntil(context, MaterialPageRoute(
-                          //     // builder: (context) => MyOrders()
-                          // ), (route) => false);
-                        }
-                      },
-                      child: Container(
-                        height: 45,
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        decoration: const BoxDecoration(
-                            border: Border(
-                                bottom: BorderSide(
-                                  width: 1,
-                                  color: Color(0xff4a9e04),
-                                )
-                            )
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(Icons.account_balance, color: Colors.black45,),
-                            // Image.asset("assets/newIcons/ic_home.png",scale: 5,
-                            //   color: Theme.of(context).iconTheme.color,),
-                            SizedBox(width: 8,),
-                            Container(
-                              child: const Text("Tableau de bord",
-                                style: TextStyle(
-                                  fontSize: 17,
-                                  fontFamily: 'medium',
-                                  color: Colors.black,
-                                ),),
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-                    //My profile
-                    InkWell(
-                      onTap: (){
-                        if(title=="Profile"){
-                          Navigator.pop(context);
-                        }else {
-                          Navigator.pop(context);
-                          // Navigator.of(context).push(SlidePageRoute(page: Profile()));
-                          Navigator.push(context, MaterialPageRoute(builder: (context)=> ProfileScreen()));
-                        }
-                      },
-                      child: Container(
-                        height: 45,
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        decoration: const BoxDecoration(
-                            border: Border(
-                                bottom: BorderSide(
-                                  width: 1,
-                                  color: Color(0xff4a9e04),
-                                )
-                            )
-                        ),
-                        child: Row(
-                          children: [
-                            Image.asset("assets/newIcons/ic_profile.png",scale: 5,
-                              color: Colors.black45,),
-                            const SizedBox(width: 8,),
-                            Container(
-                              child: const Text("Mon Profile",
-                                style: TextStyle(
-                                  fontSize: 17,
-                                  fontFamily: 'medium',
-                                  color: Colors.black,
-                                ),),
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-
-                    //Documents
-                    InkWell(
-                      onTap: (){
-                        if(title=="Client"){
-                          Navigator.pop(context);
-                        }else {
-                          Navigator.pop(context);
-                          Navigator.push(context,MaterialPageRoute(builder: (context) => const RegisterClient()));
-                        }
-                      },
-                      child: Container(
-                        height: 50,
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        decoration: const BoxDecoration(
-                            border: Border(
-                                bottom: BorderSide(
-                                  width: 1,
-                                  color: Color(0xff4a9e04),
-                                )
-                            )
-                        ),
-                        child: Row(
-                          children: [
-                            const Icon(Icons.person_add, color: Colors.black45,),
-                            const SizedBox(width: 8,),
-                            Container(
-                              child: const Text("Nouveau Client",
-                                style: TextStyle(
-                                  fontSize: 17,
-                                  fontFamily: 'medium',
+              SingleChildScrollView(
+                child: Container(
+                  child: Column(
+                    children: [
+                      //Home
+                      InkWell(
+                        onTap: (){
+                          if(title=="Home"){
+                            Navigator.pop(context);
+                          }else {
+                            // Navigator.pushAndRemoveUntil(context, MaterialPageRoute(
+                            //     // builder: (context) => MyOrders()
+                            // ), (route) => false);
+                          }
+                        },
+                        child: Container(
+                          height: 45,
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          decoration: const BoxDecoration(
+                              border: Border(
+                                  bottom: BorderSide(
+                                    width: 1,
+                                    color: Color(0xff4a9e04),
+                                  )
+                              )
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(Icons.account_balance, color: Colors.black45,),
+                              // Image.asset("assets/newIcons/ic_home.png",scale: 5,
+                              //   color: Theme.of(context).iconTheme.color,),
+                              SizedBox(width: 8,),
+                              Container(
+                                child: const Text("Tableau de bord",
+                                  style: TextStyle(
+                                    fontSize: 17,
+                                    fontFamily: 'medium',
                                     color: Colors.black,
-                                ),),
-                            )
-                          ],
+                                  ),),
+                              )
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-
-                    //Liste de clients
-
-                    InkWell(
-                      onTap: (){
-                        if(title=="Clients"){
-                          Navigator.pop(context);
-                        }else {
-                          Navigator.pop(context);
-                          Navigator.of(context).push(MaterialPageRoute(builder: (context) =>Clients()));
-                        }
-                      },
-                      child: Container(
-                        height: 45,
-                        padding: EdgeInsets.symmetric(horizontal: 20),
-                        decoration: const BoxDecoration(
-                            border: Border(
-                                bottom: BorderSide(
-                                  width: 1,
-                                  color: Color(0xff4a9e04),
-                                )
-                            )
-                        ),
-                        child: Row(
-                          children: [
-                            const Icon(Icons.person, color: Colors.black45,),
-                            SizedBox(width: 8,),
-                            Container(
-                              child: const Text("Mes clients",
-                                style: TextStyle(
-                                  fontSize: 17,
-                                  fontFamily: 'medium',
+                      //My profile
+                      InkWell(
+                        onTap: (){
+                          if(title=="Profile"){
+                            Navigator.pop(context);
+                          }else {
+                            Navigator.pop(context);
+                            // Navigator.of(context).push(SlidePageRoute(page: Profile()));
+                            Navigator.push(context, MaterialPageRoute(builder: (context)=> ProfileScreen()));
+                          }
+                        },
+                        child: Container(
+                          height: 45,
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          decoration: const BoxDecoration(
+                              border: Border(
+                                  bottom: BorderSide(
+                                    width: 1,
+                                    color: Color(0xff4a9e04),
+                                  )
+                              )
+                          ),
+                          child: Row(
+                            children: [
+                              Image.asset("assets/newIcons/ic_profile.png",scale: 5,
+                                color: Colors.black45,),
+                              const SizedBox(width: 8,),
+                              Container(
+                                child: const Text("Mon Profile",
+                                  style: TextStyle(
+                                    fontSize: 17,
+                                    fontFamily: 'medium',
                                     color: Colors.black,
-                                ),),
-                            )
-                          ],
+                                  ),),
+                              )
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                    //Clients avec du retard de cotissation
-                    InkWell(
-                      onTap: (){
-                        if(title=="ClientR"){
-                          Navigator.pop(context);
-                        }else {
-                          Navigator.pop(context);
-                          Navigator.of(context).push(MaterialPageRoute(builder: (context) =>Clients()));
-                        }
-                      },
-                      child: Container(
-                        height: 45,
-                        padding: EdgeInsets.symmetric(horizontal: 20),
-                        decoration: const BoxDecoration(
-                            border: Border(
-                                bottom: BorderSide(
-                                  width: 1,
-                                  color: Color(0xff4a9e04),
-                                )
-                            )
-                        ),
-                        child: Row(
-                          children: [
-                            const Icon(Icons.person, color: Colors.black45,),
-                            SizedBox(width: 8,),
-                            Container(
-                              child: const Text("Clients en retard",
-                                style: TextStyle(
-                                  fontSize: 17,
-                                  fontFamily: 'medium',
-                                  color: Colors.black,
-                                ),),
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-                    //History
-                    InkWell(
-                      onTap: (){
-                        if(title=="History"){
-                          Navigator.pop(context);
-                        }else {
-                          Navigator.pop(context);
-                          Navigator.push(context, MaterialPageRoute(builder: (context)=> const Historique()));
-                        }
-                      },
-                      splashColor: Colors.transparent,
-                      highlightColor: Colors.transparent,
-                      child: Container(
-                        height: 45,
-                        padding: EdgeInsets.symmetric(horizontal: 20),
-                        decoration: const BoxDecoration(
-                            border: Border(
-                                bottom: BorderSide(
-                                  width: 1,
-                                  color: Colors.green,
-                                )
-                            )
-                        ),
-                        child: Row(
-                          children: [
-                            Image.asset("assets/newIcons/ic_history.png",scale: 5,
-                              color: Colors.black45,),
-                            SizedBox(width: 8,),
-                            Container(
-                              child: const Text("Historique",
-                                style: TextStyle(
-                                  fontSize: 17,
-                                  fontFamily: 'medium',
-                                  color: Colors.black,
-                                ),),
-                            )
-                          ],
+
+                      //Documents
+                      InkWell(
+                        onTap: (){
+                          if(title=="Client"){
+                            Navigator.pop(context);
+                          }else {
+                            Navigator.pop(context);
+                            Navigator.push(context,MaterialPageRoute(builder: (context) => const RegisterClient()));
+                          }
+                        },
+                        child: Container(
+                          height: 50,
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          decoration: const BoxDecoration(
+                              border: Border(
+                                  bottom: BorderSide(
+                                    width: 1,
+                                    color: Color(0xff4a9e04),
+                                  )
+                              )
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(Icons.person_add, color: Colors.black45,),
+                              const SizedBox(width: 8,),
+                              Container(
+                                child: const Text("Nouveau Client",
+                                  style: TextStyle(
+                                    fontSize: 17,
+                                    fontFamily: 'medium',
+                                      color: Colors.black,
+                                  ),),
+                              )
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                    //Setting
-                    InkWell(
-                      onTap: (){
-                        if(title=="Setting"){
-                          Navigator.pop(context);
-                        }else {
-                          Navigator.push(context, MaterialPageRoute( builder: (context) => const ChangerMDP(),
-                          ));
-                          // Navigator.pop(context);
-                          // Navigator.push(context, PageTransition(type: PageTransitionType.leftToRight, child: ChangerMDP()));
-                        }
-                      },
-                      child: Container(
-                        height: 45,
-                        padding: EdgeInsets.symmetric(horizontal: 20),
-                        decoration: const BoxDecoration(
-                            border: Border(
-                                bottom: BorderSide(
-                                  width: 1,
-                                  color: Color(0xff4a9e04),
-                                )
-                            )
-                        ),
-                        child: Row(
-                          children: [
-                            Image.asset("assets/newIcons/ic_setting.png",scale: 5,
-                              color: Colors.black45,),
-                            SizedBox(width: 8,),
-                            Container(
-                              child: const Text("Changer mot de passe",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontFamily: 'medium',
-                                  color: Colors.black,
-                                ),),
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-                    //Logout
-                    InkWell(
-                      onTap: (){
-                        _logout(context);
-                      },
-                      child: Container(
-                        height: 50,
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        decoration: const BoxDecoration(
-                            border: Border(
-                                bottom: BorderSide(
-                                  width: 1,
-                                  color: Color(0xff4a9e04),
-                                )
-                            )
-                        ),
-                        child: Row(
-                          children: [
-                            Image.asset("assets/newIcons/ic_logout.png",scale: 5,
-                              color: Colors.black45,),
-                            const SizedBox(width: 8,),
-                            Container(
-                              child: const Text("Deconnexion",
-                                style: TextStyle(
-                                  fontSize: 17,
-                                  fontFamily: 'medium',
-                                  color: Colors.black,
-                                ),),
-                            )
-                          ],
+
+                      //Liste de clients
+
+                      InkWell(
+                        onTap: (){
+                          if(title=="Clients"){
+                            Navigator.pop(context);
+                          }else {
+                            Navigator.pop(context);
+                            Navigator.of(context).push(MaterialPageRoute(builder: (context) =>Clients()));
+                          }
+                        },
+                        child: Container(
+                          height: 45,
+                          padding: EdgeInsets.symmetric(horizontal: 20),
+                          decoration: const BoxDecoration(
+                              border: Border(
+                                  bottom: BorderSide(
+                                    width: 1,
+                                    color: Color(0xff4a9e04),
+                                  )
+                              )
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(Icons.person, color: Colors.black45,),
+                              SizedBox(width: 8,),
+                              Container(
+                                child: const Text("Mes clients",
+                                  style: TextStyle(
+                                    fontSize: 17,
+                                    fontFamily: 'medium',
+                                      color: Colors.black,
+                                  ),),
+                              )
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                      InkWell(
+                        onTap: (){
+                          if(title=="Mes produits"){
+                            Navigator.pop(context);
+                          }else {
+                            Navigator.pop(context);
+                            Navigator.of(context).push(MaterialPageRoute(builder: (context) => Produits()));
+                          }
+                        },
+                        child: Container(
+                          height: 45,
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          decoration: const BoxDecoration(
+                              border: Border(
+                                  bottom: BorderSide(
+                                    width: 1,
+                                    color: Color(0xff4a9e04),
+                                  )
+                              )
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(Icons.production_quantity_limits_outlined, color: Colors.black45,),
+                              SizedBox(width: 8,),
+                              Container(
+                                child: const Text("Mes produits",
+                                  style: TextStyle(
+                                    fontSize: 17,
+                                    fontFamily: 'medium',
+                                    color: Colors.black,
+                                  ),),
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
+                      //Clients avec du retard de cotissation
+                      InkWell(
+                        onTap: (){
+                          if(title=="ClientR"){
+                            Navigator.pop(context);
+                          }else {
+                            Navigator.pop(context);
+                            Navigator.of(context).push(MaterialPageRoute(builder: (context) =>Clients()));
+                          }
+                        },
+                        child: Container(
+                          height: 45,
+                          padding: EdgeInsets.symmetric(horizontal: 20),
+                          decoration: const BoxDecoration(
+                              border: Border(
+                                  bottom: BorderSide(
+                                    width: 1,
+                                    color: Color(0xff4a9e04),
+                                  )
+                              )
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(Icons.person, color: Colors.black45,),
+                              SizedBox(width: 8,),
+                              Container(
+                                child: const Text("Clients en retard",
+                                  style: TextStyle(
+                                    fontSize: 17,
+                                    fontFamily: 'medium',
+                                    color: Colors.black,
+                                  ),),
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
+                      //History
+                      InkWell(
+                        onTap: (){
+                          if(title=="History"){
+                            Navigator.pop(context);
+                          }else {
+                            Navigator.pop(context);
+                            Navigator.push(context, MaterialPageRoute(builder: (context)=> const Historique()));
+                          }
+                        },
+                        splashColor: Colors.transparent,
+                        highlightColor: Colors.transparent,
+                        child: Container(
+                          height: 45,
+                          padding: EdgeInsets.symmetric(horizontal: 20),
+                          decoration: const BoxDecoration(
+                              border: Border(
+                                  bottom: BorderSide(
+                                    width: 1,
+                                    color: Colors.green,
+                                  )
+                              )
+                          ),
+                          child: Row(
+                            children: [
+                              Image.asset("assets/newIcons/ic_history.png",scale: 5,
+                                color: Colors.black45,),
+                              SizedBox(width: 8,),
+                              Container(
+                                child: const Text("Historique",
+                                  style: TextStyle(
+                                    fontSize: 17,
+                                    fontFamily: 'medium',
+                                    color: Colors.black,
+                                  ),),
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
+                      //Setting
+                      InkWell(
+                        onTap: (){
+                          if(title=="Setting"){
+                            Navigator.pop(context);
+                          }else {
+                            Navigator.push(context, MaterialPageRoute( builder: (context) => const ChangerMDP(),
+                            ));
+                            // Navigator.pop(context);
+                            // Navigator.push(context, PageTransition(type: PageTransitionType.leftToRight, child: ChangerMDP()));
+                          }
+                        },
+                        child: Container(
+                          height: 45,
+                          padding: EdgeInsets.symmetric(horizontal: 20),
+                          decoration: const BoxDecoration(
+                              border: Border(
+                                  bottom: BorderSide(
+                                    width: 1,
+                                    color: Color(0xff4a9e04),
+                                  )
+                              )
+                          ),
+                          child: Row(
+                            children: [
+                              Image.asset("assets/newIcons/ic_setting.png",scale: 5,
+                                color: Colors.black45,),
+                              SizedBox(width: 8,),
+                              Container(
+                                child: const Text("Changer mot de passe",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontFamily: 'medium',
+                                    color: Colors.black,
+                                  ),),
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
+                      //Logout
+                      InkWell(
+                        onTap: (){
+                          _logout(context);
+                        },
+                        child: Container(
+                          height: 50,
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          decoration: const BoxDecoration(
+                              border: Border(
+                                  bottom: BorderSide(
+                                    width: 1,
+                                    color: Color(0xff4a9e04),
+                                  )
+                              )
+                          ),
+                          child: Row(
+                            children: [
+                              Image.asset("assets/newIcons/ic_logout.png",scale: 5,
+                                color: Colors.black45,),
+                              const SizedBox(width: 8,),
+                              Container(
+                                child: const Text("Deconnexion",
+                                  style: TextStyle(
+                                    fontSize: 17,
+                                    fontFamily: 'medium',
+                                    color: Colors.black,
+                                  ),),
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
               //Version

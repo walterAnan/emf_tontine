@@ -34,12 +34,15 @@ Future<void> main() async{
 
 class MyApp extends StatelessWidget {
    const MyApp({Key? key}) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return  MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Navigation avec Flutter',
+      theme: ThemeData(
+        radioTheme: RadioThemeData(
+        fillColor: MaterialStateColor.resolveWith((states) => const Color(0xff4a9e04))
+      ),),
       routes: {
           '/souscrire': (context)=> const Souscrire(),
       },

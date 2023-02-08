@@ -1,8 +1,12 @@
+import 'package:emf_tontine/data/apiProviders/enumApi.dart';
+import 'package:emf_tontine/data/models/civilite.dart';
 import 'package:emf_tontine/presentation/screens/registerClient.dart';
-import 'package:emf_tontine/presentation/screens/souscrire.dart';
+import 'package:emf_tontine/presentation/screens/souscrireM.dart';
 import 'package:flutter/material.dart';
+import 'package:getwidget/components/dropdown/gf_dropdown.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 
 class ClientMoral extends StatefulWidget {
   const ClientMoral({Key? key}) : super(key: key);
@@ -14,17 +18,22 @@ class ClientMoral extends StatefulWidget {
 }
 
 class _ClientMoralState extends State<ClientMoral> {
-
-
+  final TextEditingController textEditingController = TextEditingController();
   final TextEditingController _date = TextEditingController();
+  final TextEditingController _raisonSociale = TextEditingController();
+  final TextEditingController _formeJuridique = TextEditingController();
+  final TextEditingController _nomRespo = TextEditingController();
+  final TextEditingController _prenomRespo = TextEditingController();
+  final TextEditingController _dateCreation =  TextEditingController();
+  final TextEditingController _telephone = TextEditingController();
+  final TextEditingController _adresseMail = TextEditingController();
+  final TextEditingController _quartier = TextEditingController();
+  final TextEditingController _nationalite = TextEditingController();
+  String initialCountry = 'GA';
+  PhoneNumber number = PhoneNumber(isoCode: 'GA');
   late String dropdown;
-  bool _isBackPressedOrTouchedOutSide = false,
-      _isPanDown = false;
-  bool _isDropDownOpened = false;
-  late final List<String> _list = ["Abc", "DEF", "GHI", "JKL", "MNO", "PQR"];
-  String _selectedItem = '';
   List<String> Adresse = [''];
-  List<String> Civilite = [''];
+  List<Civilite> _civilite = [];
 
   var _index= 0;
   var hauteur;
@@ -32,6 +41,157 @@ class _ClientMoralState extends State<ClientMoral> {
   var numero;
   bool isLoading = false;
   Residence? _estResident = Residence.OUI;
+
+  dynamic dropdownValue;
+
+  String? selectedValue;
+
+  final List<dynamic> _list_pays = [];
+  late final List<dynamic> _type_piece = [];
+  final List<String> _etat_matrimonial = [];
+  dynamic _selected_pays_residence;
+  dynamic _selected_pays_localisation;
+  final List<dynamic> _ville =  [];
+  final List<dynamic> _profession =  [];
+  dynamic selected_civilite;
+  dynamic selected_ville;
+
+  bool select= false;
+  List<String> list = ['Pas de type de pièce'];
+
+  bool isLoading1 = false;
+  bool isLoading2 = false;
+  List<String> sexe = ['Homme', 'Femme'];
+  Sexe? _sexe = Sexe.homme;
+
+
+
+  getDataCivilite() async {
+    var list = await GetDataProvider().getCivilite();
+    if(list != null){
+      for(int i = 0; i< list.length; i++){
+        _civilite.add(list[i]);
+        print(list[i].libelle);
+      }
+      setState(() {
+        isLoading = false;
+      });
+
+    }else{
+      print('Le retour est nul');
+    }
+
+  }
+
+
+  getDataVille() async {
+    var list = await GetDataProvider().getVille();
+    if(list != null){
+      for(int i = 0; i< list.length; i++){
+        _ville.add(list[i]);
+        print(list[i]['nom']);
+
+      }
+      setState(() {
+        isLoading = false;
+      });
+
+    }else{
+      print('Le retour est nul');
+    }
+
+  }
+
+
+
+  getDataProfession() async {
+    var list = await GetDataProvider().getprofession();
+    if(list != null){
+      for(int i = 0; i< list.length; i++){
+        _profession.add(list[i]);
+        print(list[i]['libelle']);
+
+      }
+      setState(() {
+        isLoading = false;
+      });
+
+    }else{
+      print('Le retour est nul');
+    }
+
+  }
+
+  getDataTypePiece() async {
+    isLoading2 = true;
+    var list = await GetDataProvider().getTypePiece();
+    if(list != null){
+      for(int i = 0; i< list.length; i++){
+        print('les pieces');
+        _type_piece.add(list[i].libelle);
+        print('pieces après');
+        print('liste des piece: $_type_piece');
+
+      }
+      setState(() {
+        isLoading2 = false;
+      });
+    }else{
+      print('Le retour est nul');
+    }
+
+  }
+
+  getDataEtatMatri() async {
+    var list = await GetDataProvider().getEtatMatri();
+    if(list != null){
+      for(int i = 0; i< list.length; i++){
+        print(list[i]);
+        _etat_matrimonial.add(list[i]['libelle']);
+        print(list[i]['libelle']);
+      }
+      setState(() {
+        isLoading1 = false;
+      });
+    }else{
+      print('Le retour est nul');
+    }
+
+  }
+
+
+  getDataPays() async {
+    var list = await GetDataProvider().getPays();
+    if(list != null){
+      for(int i = 0; i< list.length; i++){
+        print('pays ${list[i]}');
+        _list_pays.add(list[i]);
+      }
+    }else{
+      print('Le retour est nul');
+    }
+
+
+  }
+
+  @override
+  void initState() {
+    isLoading = true;
+    Future.delayed(Duration.zero, ()async {
+      getDataCivilite();
+      getDataEtatMatri();
+      getDataPays();
+      getDataTypePiece();
+      getDataVille();
+      getDataProfession();
+
+    });
+
+    super.initState();
+
+
+  }
+
 
 
   @override
@@ -47,22 +207,25 @@ class _ClientMoralState extends State<ClientMoral> {
         .width;
 
     return Scaffold(
+      backgroundColor: const Color(0xff4a9e04),
         body: Column(
             children: [
               Container(
+                color: const Color(0xff4a9e04),
                 margin: const EdgeInsets.only(top: 50),
                 child: Text(
-                  'Enrollement d\'un client', style: GoogleFonts.adamina(
-                    fontSize: 20
+                  'Enrollement d\'un client moral', style: GoogleFonts.adamina(
+                    fontSize: 19,
+                  color: Colors.white
                 ),
                 ),
               ),
 
               Expanded(
               child: Theme(data: ThemeData(
-              accentColor: Color(0xff4a9e04),
+              accentColor: const Color(0xff4a9e04),
               // primarySwatch: Color(0xff4a9e04),
-              colorScheme: ColorScheme.light(
+              colorScheme: const ColorScheme.light(
               primary: Color(0xff4a9e04)
               )
               ),
@@ -91,7 +254,26 @@ class _ClientMoralState extends State<ClientMoral> {
                               _index += 1;
                             });
                           }else{
-                            Navigator.push(context, MaterialPageRoute(builder: (context)=> const Souscrire()));
+                            dynamic clientMoral = {
+                              "adress": _quartier.text,
+                              "quarier": _quartier.text,
+                              "ville": selected_ville,
+                              "telephone": _telephone.text,
+                              "email": _adresseMail.text,
+                              "resident": _estResident,
+                              "dateCreation": _dateCreation.text,
+                              "paysResidence":_selected_pays_residence,
+                              "nationalite": _nationalite.text,
+                              "raisonSociale": _raisonSociale.text,
+                              "nomRespon":_nomRespo.text,
+                              "prenomRespon":_prenomRespo.text,
+                              "formeJuridique":_formeJuridique.text
+
+                            };
+
+                            print('les infos du client mora: $clientMoral');
+                            Navigator.push(context, MaterialPageRoute(builder: (context)=> const SouscrireM(),
+                                settings: RouteSettings(arguments: clientMoral)));
                           }
                         },
                         onStepTapped: (int index) {
@@ -99,10 +281,31 @@ class _ClientMoralState extends State<ClientMoral> {
                             _index = index;
                           });
                         },
+                        controlsBuilder: (BuildContext context, ControlsDetails details) {
+                          return Row(
+                            children: <Widget>[
+                              Container(
+                                color: Colors.green,
+                                margin: const EdgeInsets.all(5),
+                                child: TextButton(
+                                  onPressed: details.onStepContinue,
+                                  child: const Text('Suivant', style: TextStyle(color: Colors.white),),
+                                ),
+                              ),
+                              Container(
+                                color: Colors.grey,
+                                child: TextButton(
+                                  onPressed: details.onStepCancel,
+                                  child: const Text('Retour', style: TextStyle(color: Colors.white)),
+                                ),
+                              ),
+                            ],
+                          );
+                        },
                         steps: <Step>[
                           Step(
                             isActive: _index ==0,
-                            title: const Text('Identité'),
+                            title: const Text('Société'),
                             content: Container(
                                 alignment: Alignment.centerLeft,
                                 child: Column(
@@ -139,6 +342,7 @@ class _ClientMoralState extends State<ClientMoral> {
                                     ),
                                     const SizedBox(height: 5,),
                                     TextFormField(
+                                      controller: _raisonSociale,
                                       decoration: const InputDecoration(
                                         labelText: 'Raison sociale',
                                       ),
@@ -151,21 +355,85 @@ class _ClientMoralState extends State<ClientMoral> {
                                       },
                                     ),
                                     const SizedBox(height: 5,),
+
                                     TextFormField(
+                                      controller: _formeJuridique,
                                       decoration: const InputDecoration(
-                                        labelText: 'Téléphone',
+                                        labelText: 'Forme juridique',
                                       ),
                                       // The validator receives the text that the user has entered.
                                       validator: (value) {
                                         if (value == null || value.isEmpty) {
-                                          return 'Entrer le numéro de télephone';
+                                          return 'Entrer la forme juridique';
                                         }
                                         return null;
                                       },
                                     ),
+                                    const SizedBox(height: 5,),
+                                    // TextFormField(
+                                    //   decoration: const InputDecoration(
+                                    //     labelText: 'Téléphone',
+                                    //   ),
+                                    //   // The validator receives the text that the user has entered.
+                                    //   validator: (value) {
+                                    //     if (value == null || value.isEmpty) {
+                                    //       return 'Entrer le numéro de télephone';
+                                    //     }
+                                    //     return null;
+                                    //   },
+                                    // ),
+
+                                    Container(
+                                      margin: const EdgeInsets.symmetric(horizontal: 10),
+                                      // child: TextFormField(
+                                      //   controller: _telephone,
+                                      //   keyboardType: TextInputType.number,
+                                      //   decoration: const InputDecoration(
+                                      //     labelText: 'Telephone',
+                                      //   ),
+                                      //   // The validator receives the text that the user has entered.
+                                      //   validator: (value) {
+                                      //     if (value == null || value.isEmpty) {
+                                      //       return 'Please enter some text';
+                                      //     }
+                                      //     return null;
+                                      //   },
+                                      // ),
+                                      child: InternationalPhoneNumberInput(
+                                        hintText: 'Téléphone',
+                                        errorMessage: 'Numéro de téléphone incorrecte',
+                                        onInputChanged: (PhoneNumber number) {
+                                          print(number.phoneNumber);
+                                        },
+                                        onInputValidated: (bool value) {
+                                          print(value);
+                                        },
+                                        selectorConfig: const SelectorConfig(
+                                          selectorType: PhoneInputSelectorType.BOTTOM_SHEET,
+                                        ),
+                                        ignoreBlank: false,
+                                        autoValidateMode: AutovalidateMode.disabled,
+                                        selectorTextStyle: const TextStyle(color: Colors.black),
+                                        initialValue: number,
+                                        textFieldController: _telephone,
+                                        formatInput: false,
+                                        keyboardType:
+                                        const TextInputType.numberWithOptions(signed: true, decimal: true),
+                                        inputBorder: const OutlineInputBorder(),
+                                        onSaved: (PhoneNumber number) {
+                                          print('On Saved: $number');
+                                        },
+                                      ),
+                                    ),
+
+                                    Container(
+                                      height: 2,
+                                      color: Colors.black12,
+                                    ),
 
 
                                     TextFormField(
+                                      controller: _adresseMail,
                                       decoration: const InputDecoration(
                                         labelText: 'Adresse Mail',
                                       ),
@@ -179,11 +447,12 @@ class _ClientMoralState extends State<ClientMoral> {
                                     ),
 
                                     TextFormField(
+
                                       decoration: const InputDecoration(
                                         icon: Icon(Icons.calendar_today_outlined),
                                         labelText: 'Date de Creation',
                                       ),
-                                      controller: _date,
+                                      controller: _dateCreation,
                                       onTap: () async {
                                         DateTime? picked = await showDatePicker(
                                             context: context,
@@ -193,7 +462,7 @@ class _ClientMoralState extends State<ClientMoral> {
                                         if (picked != null) {
                                           print(DateFormat('yyyy-MM-dd').format(picked));
                                           setState(() {
-                                            _date.text = DateFormat('yyyy-MM-dd').format(picked);
+                                            _dateCreation.text = DateFormat('yyyy-MM-dd').format(picked);
                                           });
                                         }
                                       },
@@ -215,18 +484,76 @@ class _ClientMoralState extends State<ClientMoral> {
                                 alignment: Alignment.centerLeft,
                                 child: Column(
                                   children: [
-                                    const SizedBox(height: 5,),
                                     TextFormField(
+                                      controller: _quartier,
                                       decoration: const InputDecoration(
-                                        labelText: 'Pays',
+                                        labelText: 'Quartier',
                                       ),
                                       // The validator receives the text that the user has entered.
                                       validator: (value) {
                                         if (value == null || value.isEmpty) {
-                                          return 'Entrer le pays';
+                                          return 'Entrer le quartier';
                                         }
                                         return null;
                                       },
+                                    ),
+                                    const SizedBox(height: 5,),
+
+                                    Container(
+                                      height: 50,
+                                      width: MediaQuery.of(context).size.width,
+                                      margin: const EdgeInsets.all(5),
+                                      child: DropdownButtonHideUnderline(
+                                        child: GFDropdown(
+                                          hint: const Text('Ville de naissance'),
+                                          padding: const EdgeInsets.only(left: 15, right: 5),
+                                          borderRadius: BorderRadius.circular(10),
+                                          border: const BorderSide(
+                                              color: Colors.black12, width: 1),
+                                          dropdownButtonColor: Colors.grey[100],
+                                          value: selected_ville,
+                                          onChanged: (newValue) {
+                                            setState(() {
+                                              selected_ville = newValue;
+                                            });
+                                          },
+                                          items:_ville
+                                              .map((value) => DropdownMenuItem(
+                                            value: value,
+                                            child: _ville.isEmpty? const Text('Pas de ville disponible') : Text(value['nom']),
+                                          ))
+                                              .toList(),
+                                        ),
+                                      ),
+                                    ),
+
+
+                                    Container(
+                                      height: 50,
+                                      width: MediaQuery.of(context).size.width,
+                                      margin: const EdgeInsets.all(5),
+                                      child: DropdownButtonHideUnderline(
+                                        child: GFDropdown(
+                                          hint: const Text('Pays de localisation'),
+                                          padding: const EdgeInsets.only(left: 15, right: 5),
+                                          borderRadius: BorderRadius.circular(10),
+                                          border: const BorderSide(
+                                              color: Colors.black12, width: 1),
+                                          dropdownButtonColor: Colors.grey[100],
+                                          value: _selected_pays_localisation,
+                                          onChanged: (newValue) {
+                                            setState(() {
+                                              _selected_pays_localisation = newValue;
+                                            });
+                                          },
+                                          items:_list_pays
+                                              .map((value) => DropdownMenuItem(
+                                            value: value,
+                                            child: Text(value.nom),
+                                          ))
+                                              .toList(),
+                                        ),
+                                      ),
                                     ),
                                     const SizedBox(height: 5,),
                                     TextFormField(
@@ -243,30 +570,6 @@ class _ClientMoralState extends State<ClientMoral> {
                                     ),
 
 
-                                    TextFormField(
-                                      decoration: const InputDecoration(
-                                        labelText: 'Quartier',
-                                      ),
-                                      // The validator receives the text that the user has entered.
-                                      validator: (value) {
-                                        if (value == null || value.isEmpty) {
-                                          return 'Entrer le quartier';
-                                        }
-                                        return null;
-                                      },
-                                    ),
-                                    TextFormField(
-                                      decoration: const InputDecoration(
-                                        labelText: 'Ville',
-                                      ),
-                                      // The validator receives the text that the user has entered.
-                                      validator: (value) {
-                                        if (value == null || value.isEmpty) {
-                                          return 'Entrer la ville';
-                                        }
-                                        return null;
-                                      },
-                                    ),
 
 
                                   ],
@@ -280,6 +583,7 @@ class _ClientMoralState extends State<ClientMoral> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 TextFormField(
+                                  controller: _nomRespo,
                                   decoration: const InputDecoration(
                                     labelText: 'Nom du Responsable',
                                   ),
@@ -293,6 +597,7 @@ class _ClientMoralState extends State<ClientMoral> {
                                 ),
 
                                 TextFormField(
+                                  controller: _prenomRespo,
                                   decoration: const InputDecoration(
                                     labelText: 'Prenom du Responsable',
                                   ),
@@ -306,6 +611,7 @@ class _ClientMoralState extends State<ClientMoral> {
                                 ),
 
                                 TextFormField(
+                                  controller: _nationalite,
                                   decoration: const InputDecoration(
                                     labelText: 'Nationalité',
                                   ),
@@ -318,18 +624,34 @@ class _ClientMoralState extends State<ClientMoral> {
                                   },
                                 ),
 
-                                TextFormField(
-                                  decoration: const InputDecoration(
-                                    labelText: 'Pays de Residence',
+                                Container(
+                                  height: 50,
+                                  width: MediaQuery.of(context).size.width,
+                                  margin: const EdgeInsets.all(5),
+                                  child: DropdownButtonHideUnderline(
+                                    child: GFDropdown(
+                                      hint: const Text('Pays de Résidence'),
+                                      padding: const EdgeInsets.only(left: 15, right: 5),
+                                      borderRadius: BorderRadius.circular(10),
+                                      border: const BorderSide(
+                                          color: Colors.black12, width: 1),
+                                      dropdownButtonColor: Colors.grey[100],
+                                      value: _selected_pays_residence,
+                                      onChanged: (newValue) {
+                                        setState(() {
+                                          _selected_pays_residence = newValue;
+                                        });
+                                      },
+                                      items:_list_pays
+                                          .map((value) => DropdownMenuItem(
+                                        value: value,
+                                        child: Text(value.nom),
+                                      ))
+                                          .toList(),
+                                    ),
                                   ),
-                                  // The validator receives the text that the user has entered.
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'Please enter some text';
-                                    }
-                                    return null;
-                                  },
                                 ),
+
 
 
                               ],

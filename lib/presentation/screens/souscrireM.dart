@@ -1,28 +1,25 @@
 
 
-import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:emf_tontine/data/apiProviders/dataApi.dart';
 import 'package:emf_tontine/data/apiProviders/enumApi.dart';
 import 'package:emf_tontine/data/models/client_particulier.dart';
 import 'package:emf_tontine/data/models/objet.dart';
-import 'package:emf_tontine/presentation/screens/photo.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:getwidget/components/dropdown/gf_dropdown.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:emf_tontine/globals.dart' as global;
 
 
 
 
-class Souscrire extends StatefulWidget {
-  const Souscrire({Key? key}) : super(key: key);
+class SouscrireM extends StatefulWidget {
+  const SouscrireM({Key? key}) : super(key: key);
 
   @override
-  State<Souscrire> createState() => _SouscrireState();
+  State<SouscrireM> createState() => _SouscrireMState();
 }
 
-class _SouscrireState extends State<Souscrire> {
-
+class _SouscrireMState extends State<SouscrireM> {
   bool isLoading = true;
   bool isLoading1 = true;
   bool selected = false;
@@ -86,7 +83,7 @@ class _SouscrireState extends State<Souscrire> {
   }
 
   @override
-  void setState(VoidCallback fn) async {
+  void setState(VoidCallback fn) {
     // TODO: implement setState
     super.setState(fn);
     _selectedItem=_selectedItem;
@@ -94,15 +91,12 @@ class _SouscrireState extends State<Souscrire> {
   @override
   Widget build(BuildContext context) {
     // final Object? client = ModalRoute.of(context)?.settings.arguments;
-    final Map client = ModalRoute.of(context)?.settings.arguments as Map;
+    final Map clientMoral = ModalRoute.of(context)?.settings.arguments as Map;
+    if (kDebugMode) {
+      print(clientMoral);
+    }
+    AdresseE adres = AdresseE(type: "ADRESSE_RESIDENCE", adresse: "Libreville IAI", paysId: 27, codePostal: '2263', quartier: 'IAI', villeId: 31, telephone: clientMoral['telephone'], email: clientMoral['email']);
 
-    print('les données renvoyées au fichier souscrire: $client');
-    AdresseE adres = AdresseE(adresse: "Libreville IAI", paysId: 27, codePostal: '2263', quartier: 'IAI', villeId: 31, telephone: client['personne']['adresse']['telephone'], email: client['personne']['adresse']['email']);
-
-    PersonneE _personne = PersonneE(adresse: adres, resident: client['personne']['resident'], dateNaissance: DateTime.parse(client['personne']['dateNaissance']), paysResidence: client['personne']['paysResidence'], nationalite: client['personne']['nationalite'], civilite: client['personne']['civilite'], nom: client['personne']['nom'],  prenom: client['personne']['prenom'], sexe: client['personne']['sexe'], etatMatrimoniale: 'CELIBATAIRE');
-    ClientE _clt = ClientE(personne: _personne, gestionnaireId: 274,
-        typeClientId: 1041,);
-    _client = _clt;
     return Scaffold(
       appBar: AppBar(
         elevation: 00,
@@ -112,7 +106,7 @@ class _SouscrireState extends State<Souscrire> {
       body:(isLoading || isLoading1) ? const Center(child: CircularProgressIndicator()):
       Column(
         children: [
-         const SizedBox(height: 10,),
+          const SizedBox(height: 10,),
           Container(
             color: Colors.white,
             child: Center(
@@ -121,8 +115,8 @@ class _SouscrireState extends State<Souscrire> {
                 width: 80,
                 child: Container(
                   // margin: const EdgeInsets.only(top: 40, right: 20),
-                  height: 80,
-                  width: 80,
+                    height: 80,
+                    width: 80,
                     decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         border: Border.all(
@@ -162,7 +156,7 @@ class _SouscrireState extends State<Souscrire> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text('Nom: ', style: GoogleFonts.abhayaLibre(color: Colors.grey, fontSize: 18, fontWeight: FontWeight.w300),),
+                  Text('Nom: Morale', style: GoogleFonts.abhayaLibre(color: Colors.grey, fontSize: 18, fontWeight: FontWeight.w300),),
                   const SizedBox(width: 3,),
                 ],
               ),
@@ -214,11 +208,40 @@ class _SouscrireState extends State<Souscrire> {
                   ),
                 ),
 
+
+                // Container(
+                //   height: 50,
+                //   width: MediaQuery.of(context).size.width,
+                //   margin: const EdgeInsets.all(10),
+                //   child: DropdownButtonHideUnderline(
+                //     child: GFDropdown(
+                //       hint: const Text('fréquence de collecte'),
+                //       padding: const EdgeInsets.only(left: 15, right: 5),
+                //       borderRadius: BorderRadius.circular(10),
+                //       border: const BorderSide(
+                //           color: Colors.black12, width: 1),
+                //       dropdownButtonColor: Colors.grey[100],
+                //       value: _selectionFrequence,
+                //       onChanged: (newValue) {
+                //         setState(() {
+                //           _selectionFrequence = newValue;
+                //           data['produit'] = _selectionFrequence;
+                //         });
+                //       },
+                //       items:_frequences
+                //           .map((value) => DropdownMenuItem(
+                //         value: value,
+                //         child: Text(value),
+                //       ))
+                //           .toList(),
+                //     ),
+                //   ),
+                // ),
                 const SizedBox(height: 20,),
 
                 Container(
-                  padding: const EdgeInsets.only(left: 10),
-                    child: Text(selected?'Frequence de collecte':'')),
+                    padding: const EdgeInsets.only(left: 10),
+                    child: Text(selected?'Frequence de collecte morale':'')),
 
                 Container(
                   height: 50,
@@ -227,18 +250,18 @@ class _SouscrireState extends State<Souscrire> {
                   padding: const EdgeInsets.only(left: 10),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
-                        border: Border.all(
-                                color: Colors.black12,
-                                width: 1.0,
-                                ),
-                        color: Colors.grey[100],
+                    border: Border.all(
+                      color: Colors.black12,
+                      width: 1.0,
+                    ),
+                    color: Colors.grey[100],
                   ),
                   child: TextField(
-                    readOnly: true,
-                    decoration: InputDecoration(
-                      hintText: !selected? 'Fréquence collecte': _selectionProduit['freqCollecte']['libelle'],
+                      readOnly: true,
+                      decoration: InputDecoration(
+                        hintText: !selected? 'Fréquence collecte': _selectionProduit['freqCollecte']['libelle'],
                         border: InputBorder.none,
-                    )
+                      )
                   ),
                 ),
                 const SizedBox(height: 20,),
@@ -265,7 +288,7 @@ class _SouscrireState extends State<Souscrire> {
                       readOnly: true,
                       decoration: InputDecoration(
                           hintText: !selected? 'Cycle': _selectionProduit['cycle'],
-                        border: InputBorder.none
+                          border: InputBorder.none
                       )
                   ),
                 ),
@@ -393,7 +416,7 @@ class _SouscrireState extends State<Souscrire> {
 
                         ),
                         onPressed: () {
-                        Navigator.pop(context);
+                          Navigator.pop(context);
                         },
                         icon: const Icon(Icons.cancel, color: Colors.red,),  //icon data for elevated button
                         label: const Text("Annuler", style: TextStyle(fontSize: 20),), //label text
@@ -414,6 +437,7 @@ class _SouscrireState extends State<Souscrire> {
                         ),
                         onPressed: () {
                           autreObjet.text == ''? _selectionObjet : _selectionObjet = autreObjet.value as Objet;
+                          // _souscriptionM = SouscriptionM(produit: _selectionProduit, periodicite: _selectionFrequence, objet: _selectionObjet, mise: mise.text);
                           data['objet'] = _selectionObjet.libelle;
                           print('objet de la souscription : ${_selectionObjet.libelle}');
                           print('frequence de collecte: ${_selectionProduit['freqCollecte']['value']}');
@@ -422,6 +446,7 @@ class _SouscrireState extends State<Souscrire> {
                           print('data: $data');
                           int montant = int.parse(mise.text);
                           print('print le montant: $montant');
+                          print('print le sexe: $montant');
                           _dialogBuilder(context);
                         },
                         icon: const Icon(Icons.save),  //icon data for elevated button
@@ -438,60 +463,6 @@ class _SouscrireState extends State<Souscrire> {
         ],
       ),
     );
-
-  }
-
-  void popup(BuildContext context, int i){
-    print('le statut reçu $i');
-    if(i == 201){
-      AwesomeDialog(
-        context: context,
-        animType: AnimType.leftSlide,
-        headerAnimationLoop: false,
-        dialogType: DialogType.success,
-        showCloseIcon: true,
-        title: 'Succès',
-        desc: 'Soucription éffectuée avec succès!',
-        btnOkOnPress: () {
-          debugPrint('OnClcik');
-        },
-        btnOkIcon: Icons.check_circle,
-        onDismissCallback: (type) {
-          debugPrint('Dialog Dissmiss from callback $type');
-        },
-      ).show();
-      // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> const Photo()));
-
-    }else{
-      if(i==302)
-        {
-          AwesomeDialog(
-            context: context,
-            dialogType: DialogType.error,
-            animType: AnimType.rightSlide,
-            headerAnimationLoop: false,
-            title: 'Error',
-            desc:'Oops ce client existe déjà',
-            btnOkOnPress: () {},
-            btnOkIcon: Icons.cancel,
-            btnOkColor: Colors.red,
-          ).show();
-        }else{
-        AwesomeDialog(
-          context: context,
-          dialogType: DialogType.error,
-          animType: AnimType.rightSlide,
-          headerAnimationLoop: false,
-          title: 'Error',
-          desc:'Oops un problème est survenu dans la souscription de ce client',
-          btnOkOnPress: () {},
-          btnOkIcon: Icons.cancel,
-          btnOkColor: Colors.red,
-        ).show();
-      }
-
-    }
-    global.status = 0;
   }
 
 
@@ -519,17 +490,13 @@ class _SouscrireState extends State<Souscrire> {
               ),
               child: const Text('Valider', style: TextStyle(color: Color(0xff4a9e04)),),
               onPressed: () {
-                setState(() async {
+                setState(() {
                   ObjetSous _objetSous = ObjetSous(libelle: _selectionObjet.libelle,
-                    code: 1047,
-                    guid: "35c4cb51-0f41-4553-85bb-ee7b37d77011");
+                      code: 1047,
+                      guid: "35c4cb51-0f41-4553-85bb-ee7b37d77011");
                   print('mon double ${int.parse('40')}');
                   int montant = int.parse(mise.text);
-                  String cycle = _selectionProduit['cycle'];
-                  var i = await postClientParticulier(_objetSous,_client, montant, cycle);
-                  popup(context, i!);
-                  Navigator.pop(context);
-
+                  postClientMoral(_objetSous,_client, montant);
                 });
 
               },

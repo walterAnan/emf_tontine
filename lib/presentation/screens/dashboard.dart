@@ -53,7 +53,7 @@ class _DashboardState extends State<Dashboard> {
 
             Expanded(child: Container(
               margin: const EdgeInsets.only(left: 30),
-                child: const Text('TONTINE', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Color(0xff4a9e04)),)),),
+                child: const Text('EMF-TONTINE', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Color(0xff4a9e04)),)),),
             Container(
               margin: const EdgeInsets.only(top: 40, right: 20),
               height: 40,
@@ -173,7 +173,7 @@ class _DashboardState extends State<Dashboard> {
 
                        ),
                      ),
-                     Text('Plafond Collecte', style: GoogleFonts.acme(
+                     Text('Reste à collecter', style: GoogleFonts.acme(
                          fontSize: 18,
                        color: const Color(0xffFFFFFF)
                      ),),
@@ -374,7 +374,7 @@ class _DashboardState extends State<Dashboard> {
                                 margin: const EdgeInsets.only(top: 10, left: 10),
                                 height: 30,
                                 width: 30,
-                                child: const Icon(Icons.center_focus_weak, color: Color(0xff4a9e04),),
+                                child: const Icon(Icons.add, color: Color(0xff4a9e04),),
                                 decoration: BoxDecoration(
                                     color: Colors.white,
                                     borderRadius: BorderRadius.circular(100)
@@ -393,7 +393,7 @@ class _DashboardState extends State<Dashboard> {
 
                         Container(
                             margin: const EdgeInsets.only(left: 5),
-                            child: const Text('Scanner', style: TextStyle(
+                            child: const Text('Souscription', style: TextStyle(
                                 fontSize: 18
                             ),))
                       ],
