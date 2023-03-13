@@ -83,7 +83,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Container(
             color: const Color(0xff4a9e04),
             padding: const EdgeInsets.only(top: 35),
-            height: height*0.101,
+            height: height*0.13,
             width: width,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -99,7 +99,72 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 )),
 
                 IconButton(onPressed: (){
-                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const LoginPage()));
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext ctx){
+                      return   Dialog(
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(2)
+                        ),
+                        child: Container(
+                          height: 95,
+                          padding: EdgeInsets.only(left: 20,right: 16,top: 15,bottom: 9),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Container(
+                                alignment: Alignment.centerLeft,
+                                child: const Text("Voulez-vous vous deconnecter?",
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontFamily: "medium",
+                                    color: Colors.grey,
+                                  ),),
+                              ) ,
+                              //CANCEL AND LOGOUT BUTTON
+                              Container(
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    InkWell(
+                                      onTap: (){
+                                        Navigator.pop(context);
+                                      },
+                                      child: Container(
+                                        padding: EdgeInsets.all(10),
+                                        child: const Text("Annuler",
+                                          style: TextStyle(
+                                              color: Colors.grey,
+                                              fontSize: 13,
+                                              fontFamily: "medium"
+                                          ),),
+                                      ),
+                                    ),
+                                    InkWell(
+                                      onTap: () {
+                                        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(
+                                            builder: (context)=>LoginPage()
+                                        ), (route) => false);
+                                      },
+                                      child: Container(
+                                        padding: const EdgeInsets.all(10),
+                                        child: const Text("Déconnecter",
+                                          style: TextStyle(
+                                              color: Colors.grey,
+                                              fontSize: 13,
+                                              fontFamily: "medium"
+                                          ),),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  );
                 }, icon: const Icon(Icons.logout, color: Colors.white, size: 30,)),
 
               ],
@@ -107,6 +172,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
           ),
           Container(
+            margin: EdgeInsets.only(top: 10),
             height: height*0.22,
             color: Colors.grey.shade100,
             child: Column(

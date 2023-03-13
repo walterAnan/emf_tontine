@@ -1,10 +1,7 @@
 
-import 'package:emf_tontine/data/apiProviders/enumApi.dart';
-import 'package:emf_tontine/presentation/screens/bottom.dart';
 import 'package:emf_tontine/presentation/screens/registerClient.dart';
 import 'package:emf_tontine/presentation/screens/registerClientMorale.dart';
 import 'package:flutter/material.dart';
-
 
 
 
@@ -14,11 +11,6 @@ class ChoixClient extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // var fido = const Adherent(
-    //   id: 0,
-    //   name: 'Fido',
-    //   age: 35,
-    // );
 
     double width = MediaQuery.of(context).size.width;
     double height = MediaQuery.of(context).size.height;
@@ -66,10 +58,14 @@ class ChoixClient extends StatelessWidget {
                          ],
                        ),
                       const SizedBox(height:80),
-                      const  Center(child: Text('Personnes', style: TextStyle(
-                         fontSize: 25,
-                         fontWeight: FontWeight.w600
-                       ),)),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 25),
+                        child: const  Center(child: Text('Quel type de client que voulez-vous  souscrire? ', style: TextStyle(
+                          fontFamily: 'Quicksand',
+                           fontSize: 20,
+                           fontWeight: FontWeight.w600
+                         ),)),
+                      ),
                        // Container(
                        //   color: Colors.green,
                        //   ),
@@ -94,11 +90,12 @@ class ChoixClient extends StatelessWidget {
               child: Row(
                  children: [
                   Container(
+
                     margin: const EdgeInsets.only(left: 20, right:10),
                     width: width/2-40,
                     height: 180,
                     decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: Color(0xff4a9e04),
                         borderRadius: const BorderRadius.all(Radius.circular(20)),
                         boxShadow: [
                           BoxShadow(
@@ -114,22 +111,34 @@ class ChoixClient extends StatelessWidget {
                       child: Column(
                         children: [
                           Container(
-                            height: 150,
+                            height: 130,
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(20),
+                                color: Color(0xff4a9e04),
                                 image: const DecorationImage(
                                     image: AssetImage('assets/images/personne_physique.png',),
                                     fit: BoxFit.fill
                                 )
                             ),
                           ),
-                          const Text('Personne physique'),
+                          const SizedBox(
+                            height: 40,
+                            child: Center(
+                              child: Text('Particulier',
+                                  style: TextStyle(
+                                      fontFamily: 'Quicksand',
+                                      fontSize: 16,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w600
+                                  )),
+                            ),
+                          ),
                         ],
                       ),
                       onTap: (){
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => const RegisterClient()),
+                          MaterialPageRoute(builder: (context) => RegisterClient()),
                         );
                       },
                     ),
@@ -139,7 +148,7 @@ class ChoixClient extends StatelessWidget {
                      width: width/2-40,
                      height: 180,
                      decoration: BoxDecoration(
-                         color: Colors.white,
+                         color: const Color(0xff4a9e04),
                        borderRadius: const BorderRadius.all(Radius.circular(20)),
                          boxShadow: [
                            BoxShadow(
@@ -154,7 +163,7 @@ class ChoixClient extends StatelessWidget {
                        child: Column(
                          children: [
                            Container(
-                             height: 150,
+                             height: 130,
                              decoration: BoxDecoration(
                                  borderRadius: BorderRadius.circular(20),
                                  image: const DecorationImage(
@@ -163,7 +172,18 @@ class ChoixClient extends StatelessWidget {
                                  )
                              ),
                            ),
-                           const Text('Personne morale'),
+                           const SizedBox(
+                             height: 40,
+                             child: Center(
+                               child: Text('Entreprise',
+                                   style: TextStyle(
+                                       fontFamily: 'Quicksand',
+                                       fontSize: 16,
+                                       color: Colors.white,
+                                       fontWeight: FontWeight.w600
+                                   )),
+                             ),
+                           ),
                          ],
                        ),
                        onTap: (){

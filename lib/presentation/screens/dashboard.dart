@@ -384,7 +384,8 @@ class _DashboardState extends State<Dashboard> {
                                 print('les dimensions :'+ wt.toString() + ht.toString());
                                 Navigator.push(
                                   context,
-                                  MaterialPageRoute(builder: (context) =>   const Scanner(title: '',)),
+                                  MaterialPageRoute(builder: (context) =>   const Scanner(title: '',),
+                                  settings: const RouteSettings(arguments: 'nouveau0')),
                                 );
                               },
                             )

@@ -2,8 +2,10 @@
 
 import 'package:emf_tontine/data/apiProviders/dataApi.dart';
 import 'package:emf_tontine/data/apiProviders/enumApi.dart';
+import 'package:emf_tontine/data/models/client_morale_sous.dart';
 import 'package:emf_tontine/data/models/client_particulier.dart';
 import 'package:emf_tontine/data/models/objet.dart';
+import 'package:emf_tontine/presentation/screens/registerClient.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:getwidget/components/dropdown/gf_dropdown.dart';
@@ -27,7 +29,9 @@ class _SouscrireMState extends State<SouscrireM> {
   dynamic _selectionProduit;
   late final List<Objet> _objets = [];
   late final List<dynamic> _produits = [];
+  late AdresseM _adres ;
   dynamic _selectionObjet;
+  late Map _clientMoral;
   TextEditingController autreObjet = TextEditingController();
   TextEditingController mise = TextEditingController();
   final bool _validate = false;
@@ -40,7 +44,7 @@ class _SouscrireMState extends State<SouscrireM> {
 
 
   getDataObjet() async {
-    var list = await GetDataProvider().getObjet();
+    var list = await GetDataProvider().getObjet(context);
     if(list != null){
       for(int i = 0; i< list.length; i++){
         print('objet ${list[i].libelle}');
@@ -58,7 +62,7 @@ class _SouscrireMState extends State<SouscrireM> {
 
 
   getDataProduit() async {
-    List<dynamic> list = await getProdriut();
+    List<dynamic> list = await getProdriut(context);
     if(list != null){
       for(int i = 0; i< list.length; i++){
         _produits.add(list[i]);
@@ -91,12 +95,11 @@ class _SouscrireMState extends State<SouscrireM> {
   @override
   Widget build(BuildContext context) {
     // final Object? client = ModalRoute.of(context)?.settings.arguments;
-    final Map clientMoral = ModalRoute.of(context)?.settings.arguments as Map;
-    if (kDebugMode) {
-      print(clientMoral);
-    }
-    AdresseE adres = AdresseE(type: "ADRESSE_RESIDENCE", adresse: "Libreville IAI", paysId: 27, codePostal: '2263', quartier: 'IAI', villeId: 31, telephone: clientMoral['telephone'], email: clientMoral['email']);
+    _clientMoral = ModalRoute.of(context)?.settings.arguments as Map;
 
+
+    _adres = AdresseM(adresse: _clientMoral['adress'], paysId: _clientMoral['ville']['pays']['code'], codePostal: '2263', quartier: _clientMoral['quartier'], villeId: _clientMoral['ville']['code'], telephone: _clientMoral['telephone'], email: _clientMoral['email']);
+    print('client moral: $_clientMoral');
     return Scaffold(
       appBar: AppBar(
         elevation: 00,
@@ -491,12 +494,25 @@ class _SouscrireMState extends State<SouscrireM> {
               child: const Text('Valider', style: TextStyle(color: Color(0xff4a9e04)),),
               onPressed: () {
                 setState(() {
+                  Map produit = {
+                    'cycle': _selectionProduit['cycle']?? 'UN_MOIS',
+                    'cInterneProduit': _selectionProduit['cInterne'],
+                    'produitId': _selectionProduit['code'],
+                  };
+
+                  PersonneM _personneM = PersonneM(adresse: _adres, resident: _clientMoral['resident'] == Residence.OUI? true:false, dateNaissance: DateTime.parse(_clientMoral['dateCreation']), paysResidence: _clientMoral['paysResidence'], nationalite: _clientMoral['nationalite'], raisonSociale: _clientMoral['raisonSociale'], nif: '21005014-T', nomGerant: _clientMoral['nomRespon']+' '+_clientMoral['prenomRespon'], formeJuridique: 'EI');
+                  
+                  ClientM _clientM = ClientM(personne: _personneM, gestionnaireId: 274, typeClientId: 1041);
                   ObjetSous _objetSous = ObjetSous(libelle: _selectionObjet.libelle,
                       code: 1047,
                       guid: "35c4cb51-0f41-4553-85bb-ee7b37d77011");
-                  print('mon double ${int.parse('40')}');
+
                   int montant = int.parse(mise.text);
-                  postClientMoral(_objetSous,_client, montant);
+                  print('produit tous  : $produit');
+                  print('produit : ${produit['code']}');
+
+                  dynamic clientMoraleSous = {'montantMise': montant, 'cycleCarte': produit['cycle'], 'objetSous': _objetSous, 'cInterneProduit': produit['cInterneProduit'], 'produitId': produit['produitId'], 'deviseId': _clientMoral['ville']['pays']['devise']['code'], 'agenceId': 02, 'statut': 'ACTIF'};
+                  postClientMoral(context,_clientM, _clientMoral,clientMoraleSous);
                 });
 
               },

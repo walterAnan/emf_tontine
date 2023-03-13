@@ -4,6 +4,7 @@
 
 import 'dart:convert';
 import 'dart:ffi';
+import 'dart:io';
 
 
 List<ClientParticulier> clientParticulierFromMap(String str) => List<ClientParticulier>.from(json.decode(str).map((x)=>clientParticulierFromMap(str)));
@@ -406,6 +407,7 @@ class PersonneE {
     required this.nom,
     required this.prenom,
     required this.sexe,
+    this.photo,
     required this.etatMatrimoniale,
   });
 
@@ -418,6 +420,7 @@ class PersonneE {
   String nom;
   String prenom;
   String sexe;
+  String? photo;
   String etatMatrimoniale;
 
   factory PersonneE.fromMap(Map<String, dynamic> json) => PersonneE(
@@ -430,6 +433,7 @@ class PersonneE {
     nom: json["nom"],
     prenom: json["prenom"],
     sexe: json["sexe"],
+    photo: json["photo"],
     etatMatrimoniale: json["etatMatrimoniale"],
   );
 
@@ -443,6 +447,7 @@ class PersonneE {
     "nom": nom,
     "prenom": prenom,
     "sexe": sexe,
+    "photo":photo,
     "etatMatrimoniale": etatMatrimoniale,
   };
 }

@@ -1,5 +1,9 @@
 
+import 'package:emf_tontine/presentation/screens/ajouterProduit.dart';
+import 'package:emf_tontine/presentation/screens/changerCarnet.dart';
 import 'package:emf_tontine/presentation/screens/choix_client.dart';
+import 'package:emf_tontine/presentation/screens/registerClient.dart';
+import 'package:emf_tontine/presentation/screens/registerClientMorale.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
@@ -17,11 +21,11 @@ class Scanner extends StatefulWidget {
 class _Scanner extends State<Scanner> {
   final GlobalKey _gLobalkey = GlobalKey();
   String _scanBarcode = '';
+ Object? provenance;
 
 
   Future<void> scanQR() async {
     String barcodeScanRes;
-    // Platform messages may fail, so we use a try/catch PlatformException.
     try {
       barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
           '#ff6666', 'Cancel', true, ScanMode.QR);
@@ -30,18 +34,41 @@ class _Scanner extends State<Scanner> {
       barcodeScanRes = 'Failed to get platform version.';
     }
 
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
     if (!mounted) return;
 
     setState(() {
       _scanBarcode = barcodeScanRes;
+      print('ma deuxième provenace: $provenance');
+      print('le ptype de la variable provenance: ${provenance.runtimeType}');
       if(_scanBarcode != null){
 
         print('qr_code $_scanBarcode');
         //API DE RECUPERATION DE L'ID DU CLIENT APRESCLE SCANNE DU CODE QR
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> ChoixClient()));
+        if(provenance is String){
+          if(provenance == 'nouveau0'){
+            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> const ChoixClient()));
+          }else{
+            if(provenance == 'nouveau'){
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> RegisterClient()));
+            }else{
+                if(provenance=='nouveau1'){
+                  Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> const ClientMoral()));
+                }
+              }
+          }
+        }else{
+          Map<String, dynamic> nouvelleProvenance = provenance as Map<String, dynamic>;
+          if(nouvelleProvenance['arg1'] == 'carnet'){
+            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> const ChangerCarnet(),
+            settings: RouteSettings(arguments: nouvelleProvenance)));
+          }else{
+            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> const AjouterProduit(),
+                settings: RouteSettings(arguments: nouvelleProvenance)));
+          }
+
+        }
+
+
 
 
       }
@@ -50,13 +77,16 @@ class _Scanner extends State<Scanner> {
   }
  @override
   void initState() {
+
    scanQR();
+   print('ma provenance: $provenance');
     super.initState();
 
   }
 
   @override
   Widget build(BuildContext context) {
+    provenance = ModalRoute.of(context)?.settings.arguments;
     return Scaffold(
       body: Center(
         child: Column(

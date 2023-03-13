@@ -1,14 +1,11 @@
 
-
 import 'dart:async';
 import 'dart:convert';
-
 import 'package:emf_tontine/data/apiProviders/dataApi.dart';
 import 'package:emf_tontine/presentation/screens/bottom.dart';
 import 'package:emf_tontine/presentation/utils/constant.dart';
 import 'package:emf_tontine/presentation/utils/keycloak_auth.dart';
 import 'package:emf_tontine/presentation/widgets/functions.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -16,6 +13,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:http/http.dart' as http;
 import 'package:imei_plugin/imei_plugin.dart';
+import 'package:device_info_plus/device_info_plus.dart';
+import 'package:flutter_keycloak/flutter_keycloak.dart';
 
 
 
@@ -27,8 +26,14 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  static final DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
+  Map<String, dynamic> _deviceData = <String, dynamic>{};
+  final FlutterKeycloak _flutterKeycloak = FlutterKeycloak(
+
+  );
 
   var token = 'default';
+  dynamic imei;
   bool _isloading = false;
   bool _passwordVisible = false;
    ConnectivityResult _connectionStatus = ConnectivityResult.none;
@@ -39,6 +44,70 @@ class _LoginPageState extends State<LoginPage> {
   String _platformImei = 'Unknown';
   String uniqueId = "Unknown";
 
+  Future<void> initPlatformStates() async {
+    var deviceData = <String, dynamic>{};
+
+    try {
+
+          deviceData = _readAndroidBuildData(await deviceInfoPlugin.androidInfo);
+
+      }
+     on PlatformException {
+      deviceData = <String, dynamic>{
+        'Error:': 'Failed to get platform version.'
+      };
+    }
+
+    if (!mounted) return;
+
+    setState(() {
+      _deviceData = deviceData;
+    });
+  }
+
+
+
+
+
+  Map<String, dynamic> _readAndroidBuildData(AndroidDeviceInfo build) {
+    return <String, dynamic>{
+      'version.securityPatch': build.version.securityPatch,
+      'version.sdkInt': build.version.sdkInt,
+      'version.release': build.version.release,
+      'version.previewSdkInt': build.version.previewSdkInt,
+      'version.incremental': build.version.incremental,
+      'version.codename': build.version.codename,
+      'version.baseOS': build.version.baseOS,
+      'board': build.board,
+      'bootloader': build.bootloader,
+      'brand': build.brand,
+      'device': build.device,
+      'display': build.display,
+      'fingerprint': build.fingerprint,
+      'hardware': build.hardware,
+      'host': build.host,
+      'id': build.id,
+      'manufacturer': build.manufacturer,
+      'model': build.model,
+      'product': build.product,
+      'supported32BitAbis': build.supported32BitAbis,
+      'supported64BitAbis': build.supported64BitAbis,
+      'supportedAbis': build.supportedAbis,
+      'tags': build.tags,
+      'type': build.type,
+      'isPhysicalDevice': build.isPhysicalDevice,
+      'systemFeatures': build.systemFeatures,
+      'displaySizeInches':
+      ((build.displayMetrics.sizeInches * 10).roundToDouble() / 10),
+      'displayWidthPixels': build.displayMetrics.widthPx,
+      'displayWidthInches': build.displayMetrics.widthInches,
+      'displayHeightPixels': build.displayMetrics.heightPx,
+      'displayHeightInches': build.displayMetrics.heightInches,
+      'displayXDpi': build.displayMetrics.xDpi,
+      'displayYDpi': build.displayMetrics.yDpi,
+      'serialNumber': build.serialNumber,
+    };
+  }
 
 
   Future<void> initPlatformState() async {
@@ -48,10 +117,9 @@ class _LoginPageState extends State<LoginPage> {
     try {
       platformImei =
       await ImeiPlugin.getImei(shouldShowRequestPermissionRationale: false);
-      List<String> multiImei = await ImeiPlugin.getImeiMulti();
-      print(multiImei);
+      imei = await ImeiPlugin.getImeiMulti();
       idunique = await ImeiPlugin.getId();
-      print('le dernier package: $multiImei et $idunique');
+      print('le dernier package: $imei et $idunique');
     } on PlatformException {
       platformImei = 'Failed to get platform version.';
     }
@@ -72,6 +140,8 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   void initState() {
+    initPlatformState();
+    initPlatformStates();
     super.initState();
     initConnectivity();
     _connectivitySubscription =
@@ -87,61 +157,53 @@ class _LoginPageState extends State<LoginPage> {
   TextEditingController codeSecret = TextEditingController();
   TextEditingController mdp = TextEditingController();
    String lien_civilite = '$lienDev''referentiels/civilites';
-  void authentif(String id_app, String code, String mdp) async {
-    var queryResponse = await http.post(Uri.parse('https://dev-cashdelivery.ventis.group/api/apareil_auth'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-        'Authorization': 'Bearer ',
-      },
-      body: jsonEncode(<String, String>{
-        'id_app': id_app,
-        'tel': code,
-        'code': mdp,
-      }),
-    ).catchError((onError){
-      showErrorToast(context, 'Vérifiez votre Connexion Internet ');
-    });
-
-    if(queryResponse!=null && queryResponse.statusCode==200) {
-
-      var queryResponseBody = json.decode(queryResponse.body);
-
-      if (queryResponseBody['status'] == 'OK') {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (
-              context) => const Bottom()),
-        );
-
-      }
-      else {
-
-        // showDialog(context: context, builder: builder)
-
-      }
-    }else{
-      SystemNavigator.pop();
-    }
-
-
-
-  }
+  // void authentif(String id_app, String code, String mdp) async {
+  //   var queryResponse = await http.post(Uri.parse('https://dev-cashdelivery.ventis.group/api/apareil_auth'),
+  //     headers: <String, String>{
+  //       'Content-Type': 'application/json; charset=UTF-8',
+  //       'Authorization': 'Bearer ',
+  //     },
+  //     body: jsonEncode(<String, String>{
+  //       'id_app': id_app,
+  //       'tel': code,
+  //       'code': mdp,
+  //     }),
+  //   ).catchError((onError){
+  //     showErrorToast(context, 'Vérifiez votre Connexion Internet ');
+  //   });
+  //
+  //   if(queryResponse!=null && queryResponse.statusCode==200) {
+  //
+  //     var queryResponseBody = json.decode(queryResponse.body);
+  //
+  //     if (queryResponseBody['status'] == 'OK') {
+  //       Navigator.push(
+  //         context,
+  //         MaterialPageRoute(builder: (
+  //             context) => const Bottom()),
+  //       );
+  //
+  //     }
+  //     else {
+  //
+  //       // showDialog(context: context, builder: builder)
+  //
+  //     }
+  //   }else{
+  //     SystemNavigator.pop();
+  //   }
+  //
+  //
+  //
+  // }
 
   static final _formkey = GlobalKey<FormState>();
   bool isChecked = false;
 
 
+
   @override
   Widget build(BuildContext context) {
-    var ht = MediaQuery
-        .of(context)
-        .size
-        .height;
-    var wt = MediaQuery
-        .of(context)
-        .size
-        .width;
-
 
     return Scaffold(
 
@@ -151,18 +213,17 @@ class _LoginPageState extends State<LoginPage> {
               height: 50,
               color: const Color(0xff4a9e04),
             ),
-        SizedBox(height: 30,),
+        const SizedBox(height: 15,),
         SizedBox(
-        height: 45,
-      // color: Colors.green,
+        height: 40,
               child: Container(
                 child: SvgPicture.asset(
-                  'assets/images/logo-sfe.svg', height: 45,
+                  'assets/images/logo-sfe.svg', height: 40,
                   color: const Color(0xff4a9e04),),
               ),
             ),
 
-            SizedBox(height: 10,),
+            const SizedBox(height: 5,),
         // Container(
         //   alignment:  Alignment.topRight,
         //   margin: EdgeInsets.only(right: 50),
@@ -178,34 +239,34 @@ class _LoginPageState extends State<LoginPage> {
           children: [
             Center(child:
             Container(
-                height: 80,
-                width: 80,
+                height: 70,
+                width: 70,
                 decoration: BoxDecoration(
                   color: Colors.grey.shade200,
                     border: Border.all(color: Colors.grey.shade200),
                   borderRadius: BorderRadius.circular(100)
                 ),
-                child: Icon(Icons.person_outline_outlined, color: Colors.black.withOpacity(0.5), size: 78,))),
+                child: Icon(Icons.person_outline_outlined, color: Colors.black.withOpacity(0.5), size: 68,))),
           ],
         ),
 
-            const SizedBox(height: 15,),
+            const SizedBox(height: 5,),
             Text('Bienvenue sur emf-tontine',
             style: GoogleFonts.handlee(
             textStyle: const TextStyle(color: Colors.black,
-            fontSize: 23,
+            fontSize: 22,
             fontWeight: FontWeight.bold)
             )),
 
             Text('Connectez-vous pour continuer',
                 style: GoogleFonts.handlee(
                     textStyle: const TextStyle(color: Colors.green,
-                        fontSize: 15,
+                        fontSize: 14,
                         fontWeight: FontWeight.bold)
                 )),
 
 
-            const SizedBox(height: 20,),
+            const SizedBox(height: 15,),
             Expanded(
               child: SingleChildScrollView(
                child: Container(
@@ -221,6 +282,7 @@ class _LoginPageState extends State<LoginPage> {
                        border: Border.all(color: const Color(0xff4a9e04))
                    ),
                         child: TextFormField(
+                          controller: codeSecret,
                           style: const TextStyle(
                               color: Color(0xff4a9e04), fontWeight: FontWeight.w400,
                               fontSize: 18
@@ -273,6 +335,7 @@ class _LoginPageState extends State<LoginPage> {
 
                         child: TextFormField(
                           obscureText: !_passwordVisible,
+                          controller: mdp,
                           style: const TextStyle(
                               color: Color(0xff4a9e04), fontWeight: FontWeight.w400,
                               fontSize: 18
@@ -346,34 +409,36 @@ class _LoginPageState extends State<LoginPage> {
                       ElevatedButton(
                         child: _isloading? const CircularProgressIndicator(color: Colors.white,): const Text('Connexion'),
                         onPressed: () async {
-                            fetchClientPhysique();
                           if(_formkey.currentState!.validate()){
                             setState(() {
                               _isloading = true;
                             });
-                            var token = await authenticateUser('benjamin', '142946An');
-                            var token1 = token.toString();
+                            String identifiant = codeSecret.text;
+                            String mot = mdp.text;
+                            print('identifiant $identifiant et le mot de pas $mot');
+                            var status = await authenticateUser(context,identifiant, mot,);
 
-                            saveAccessToken(token1);
-                            var personne = await fetchClientPhysique();
-                            print('liste des personnes physiques .....');
-                            print('liste des personnes physiques: $personne');
-                            var token2 = await retriveAccessToken();
-
-                            print('avant');
-                            var token3 = token2['access_token'];
-                            setState(() {
-                              token = token3;
-                            });
-                            print('apres');
-                            print('aprés le token retourne: $token3');
-                            print('lien: $lien_civilite');
                             _isloading = false;
-                            initPlatformState();
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(builder: (context) => const Bottom()),
-                            );
+
+                            initPlatformStates();
+                            print('les données récuperées: $_deviceData');
+                            print(imei[0]);
+
+                            if(status == 200){
+                              // var statut = await authTpe(context, codeSecret.text, imei[0]);
+                              // print('statut de api auth tpe: $statut');
+                              // if(statut == 200){
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => const Bottom()),
+                                );
+                              // }
+
+                            }else{
+                              showErrorToast(context, 'Code agent ou mot de passe incorrect');
+                            }
+
+
                           }
 
 
@@ -398,6 +463,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
 
                       const SizedBox(height: 100,),
+
                     ],
                   ),
               ),

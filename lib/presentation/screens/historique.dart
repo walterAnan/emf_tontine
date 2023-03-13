@@ -1,16 +1,22 @@
 
 
-import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'dart:convert';
 
-class Historique extends StatefulWidget {
-  const Historique({Key? key}) : super(key: key);
+import 'package:emf_tontine/presentation/screens/details_collete.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_sunmi_printer/flutter_sunmi_printer.dart';
+import 'dart:typed_data';
+import 'package:flutter/services.dart';
+
+
+class HistoriqueCollecte extends StatefulWidget {
+  const HistoriqueCollecte({Key? key}) : super(key: key);
 
   @override
-  State<Historique> createState() => _HistoriqueState();
+  State<HistoriqueCollecte> createState() => _HistoriqueCollecteState();
 }
 
-class _HistoriqueState extends State<Historique> {
+class _HistoriqueCollecteState extends State<HistoriqueCollecte> {
   final List<String> entries = <String>['PrTrans', 'DxTrans', 'TrTrans','PrTrans', 'DxTrans', 'TrTrans', 'PrTrans', 'DxTrans', 'TrTrans'];
   final List<int> colorCodes = <int>[600, 500, 100];
   bool cliquer = false;
@@ -19,7 +25,7 @@ class _HistoriqueState extends State<Historique> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color(0xff4a9e04),
+        // backgroundColor: const Color(0xff4a9e04),
         elevation: 0,
         title: Container(
           margin: const EdgeInsets.only(top: 20),
@@ -61,7 +67,7 @@ class _HistoriqueState extends State<Historique> {
                     borderRadius: BorderRadius.circular(20.0),
                   ),
                   focusedBorder:OutlineInputBorder(
-                    borderSide: const BorderSide(color: Color(0xff4a9e04), width: 2.0),
+                    // borderSide: BorderSide(color: Color(0xff4a9e04), width: 2.0),
                     borderRadius: BorderRadius.circular(20.0),
                   ),
                   hintText: 'Rechercher',
@@ -75,103 +81,95 @@ class _HistoriqueState extends State<Historique> {
               padding: const EdgeInsets.all(8),
               itemCount: entries.length,
               itemBuilder: (BuildContext context, int index){
-                return Column(
-                  children: [
-                InkWell(
-                child: Container(
-                height: 70,
-                  // margin: EdgeInsets.only(left: 10),
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade100,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
+                return ListTile(
+                    leading: const Icon(Icons.production_quantity_limits_outlined),
+                    title: Text(entries[index],
+                      style: const TextStyle(fontSize: 18),),
+                    trailing: PopupMenuButton(
+                      itemBuilder: (context) =>
+                      [
+                        PopupMenuItem(child: TextButton(
+                          child:  Text('Changer le carnet: ${entries[index]}'),
+                          onPressed: (){
+                            dynamic produit = entries[index];
+                            Map<String, dynamic> envoie = {
+                              'arg1': 'Imprimer',
+                              'arg3': produit
+                            };
+                            Navigator.pop(context);
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) =>   const DetailsCollecte(),
+                                    settings: RouteSettings(arguments: envoie)));
+                          },)),
 
-                  child: Row(
-                      children: [
-                        Container(
-                          margin: const EdgeInsets.only(right: 10),
-                          height: 50,
-                          width: 3,
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              color: Colors.purple.shade100
-                          ),
-                        ),
-                        Text('01/09/2022', style: GoogleFonts.sacramento(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                            fontStyle: FontStyle.italic,
-                            color: Colors.black
-                        ),),
-                        Container(
-                          margin: const EdgeInsets.only(right: 10),
-                          height: 50,
-                          width: 3,
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              color: Colors.yellow
-                          ),
-                        ),
-                        Container(
-                          margin: const EdgeInsets.only(right: 70),
-                            child: Text(entries[index])),
-                        TextButton(onPressed: () {
-                          // Navigator.push(context, MaterialPageRoute(builder: (context) => DetailTransaaction()));
-
-                          setState(() {
-                            cliquer = !cliquer;
-                            elmtCliquer = index;
-                          });
-                        },
-                        child: (cliquer && elmtCliquer==index)? const Text('Moins'): const Text('Voir Plus'),)
-                      ]
-                  ),
-
-                )),
-                  if(cliquer == true && elmtCliquer==index)
-                  Container(
-                    height: 150,
-                    width: MediaQuery.of(context).size.width,
-                    color: Colors.green,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            Text('text1' + entries[index]),
-                            Text('text1' + entries[index]),
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            Text('text2' + entries[index]),
-                            Text('text1' + entries[index]),
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            Text('text3' + entries[index]),
-                            Text('text1' + entries[index]),
-                          ],
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            Text('text4' + entries[index]),
-                            Text('text1' + entries[index]),
-                          ],
-                        ),
+                        PopupMenuItem(child: TextButton(
+                          child:  Text('Imprimer: ${entries[index]}'),
+                          onPressed: (){
+                            Navigator.pop(context);
+                            _print();
+                            // print();
+                            // Navigator.push(context, MaterialPageRoute(builder: (context)=>Impression(title: 'Collecte',)));
+                          },)),
                       ],
-                    ),
+                    )
 
-                  )]);}, separatorBuilder: (BuildContext context, int index) {return Divider(
+                );}, separatorBuilder: (BuildContext context, int index) {return Divider(
             color: Theme.of(context).dividerColor,
           ); },)
 
         )],
     ));
   }
+
+  void _print() async {
+    // Test regular text
+    SunmiPrinter.hr();
+    SunmiPrinter.text(
+      'Test Sunmi Printer',
+      styles: SunmiStyles(align: SunmiAlign.center),
+    );
+    SunmiPrinter.hr();
+
+    // Test align
+    SunmiPrinter.text(
+      'left',
+      styles: SunmiStyles(bold: true, underline: true),
+    );
+    SunmiPrinter.text(
+      'center',
+      styles:
+      SunmiStyles(bold: true, underline: true, align: SunmiAlign.center),
+    );
+    SunmiPrinter.text(
+      'right',
+      styles: SunmiStyles(bold: true, underline: true, align: SunmiAlign.right),
+    );
+
+    // Test text size
+    SunmiPrinter.text('Extra small text',
+        styles: SunmiStyles(size: SunmiSize.xs));
+    SunmiPrinter.text('Medium text', styles: SunmiStyles(size: SunmiSize.md));
+    SunmiPrinter.text('Large text', styles: SunmiStyles(size: SunmiSize.lg));
+    SunmiPrinter.text('Extra large text',
+        styles: SunmiStyles(size: SunmiSize.xl));
+
+    // Test row
+    SunmiPrinter.row(
+      cols: [
+        SunmiCol(text: 'col1', width: 4),
+        SunmiCol(text: 'col2', width: 4, align: SunmiAlign.center),
+        SunmiCol(text: 'col3', width: 4, align: SunmiAlign.right),
+      ],
+    );
+
+    // Test image
+    ByteData bytes = await rootBundle.load('assets/images/logo-sfe.svg');
+    final buffer = bytes.buffer;
+    final imgData = base64.encode(Uint8List.view(buffer));
+    SunmiPrinter.image(imgData);
+
+    SunmiPrinter.emptyLines(10);
+  }
+
 }

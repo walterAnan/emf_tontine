@@ -27,7 +27,7 @@ class _ProfileClientState extends State<ProfileClient> {
   Map data = {};
 
   getDataProduit() async {
-    List<dynamic> list = await getProdriut();
+    List<dynamic> list = await getProdriut(context);
     if(list != null){
       for(int i = 0; i< list.length; i++){
         _list.add(list[i]);

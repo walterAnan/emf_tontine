@@ -1,15 +1,21 @@
 
 
+import 'dart:convert';
+
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:emf_tontine/data/apiProviders/dataApi.dart';
 import 'package:emf_tontine/data/apiProviders/enumApi.dart';
 import 'package:emf_tontine/data/models/client_particulier.dart';
 import 'package:emf_tontine/data/models/objet.dart';
-import 'package:emf_tontine/presentation/screens/photo.dart';
+import 'package:emf_tontine/presentation/screens/clients.dart';
+import 'package:emf_tontine/presentation/screens/otp.dart';
+import 'package:emf_tontine/presentation/utils/keycloak_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:getwidget/components/dropdown/gf_dropdown.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:emf_tontine/globals.dart' as global;
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 
 
@@ -23,13 +29,21 @@ class Souscrire extends StatefulWidget {
 
 class _SouscrireState extends State<Souscrire> {
 
+  final  _prefs = SharedPreferences.getInstance();
+
   bool isLoading = true;
   bool isLoading1 = true;
   bool selected = false;
+  bool selectedCycle = false;
+
+  double prixVenteCarnet = 0;
+  dynamic carnet;
 
   dynamic _selectionProduit;
   late final List<Objet> _objets = [];
   late final List<dynamic> _produits = [];
+  late final List<dynamic> _cycle = [];
+  dynamic _selected_cycle;
   dynamic _selectionObjet;
   TextEditingController autreObjet = TextEditingController();
   TextEditingController mise = TextEditingController();
@@ -43,7 +57,7 @@ class _SouscrireState extends State<Souscrire> {
 
 
   getDataObjet() async {
-    var list = await GetDataProvider().getObjet();
+    var list = await GetDataProvider().getObjet(context);
     if(list != null){
       for(int i = 0; i< list.length; i++){
         print('objet ${list[i].libelle}');
@@ -59,13 +73,93 @@ class _SouscrireState extends State<Souscrire> {
 
   }
 
+  Future<int?> postClientParticulier(BuildContext context, ObjetSous objetSous,ClientE client, int montantMise, String cycle) async {
+    Map<String, dynamic> myData = {
+      "montantMise": montantMise,
+      "intituleCarte": "carte",
+      "cycleCarte": cycle == null? "UN_MOIS":cycle,
+      "objetSous": objetSous.toMap(),
+      "client": client.toMap(),
+      "cInterneProduit": '01',
+      "produitId": 483,
+      "deviseId": 22,
+      "agenceId": 71,
+      "statut": "ACTIF"
+    };
+
+    print('afficher les données: $myData');
+    print('afficher les données1: $myData');
+    print('afficher les données2: $myData');
+
+    // var donnee = json.encode(myData, toEncodable: myDateSerializer);
+    String lienClients = '$lienDev''clients/retail/souscription/create';
+    final SharedPreferences prefs = await _prefs;
+    var accessToken = prefs.getString('ACCESS_TOKEN_KEY');
+
+    print('envoyées: ${jsonEncode(myData)}');
+    try {
+      print('nouveau: $myData');
+      final response = await http.post(Uri.parse(lienClients),
+          headers: <String, String>{
+            'Content-Type': 'application/json',
+            'Connection': 'keep-alive',
+            'Authorization': 'Bearer $accessToken'},
+          body: jsonEncode(myData));
+      print('le statut du retour avant ${response.statusCode}');
+      if(response.body.isNotEmpty){
+        print('le statut du retour avant0 ${response.statusCode}');
+        if (response.statusCode == 201) {
+          global.status = response.statusCode;
+          print('le statut du retour avant1 ${response.statusCode}');
+
+          return response.statusCode;
+        } else if(response.statusCode == 401){
+          refreshToken(context);
+          return postClientParticulier( context,  objetSous, client,  montantMise,  cycle);
+        }  else {
+          return response.statusCode;
+        }
+      }
+    } catch (e) {
+      print('error: ${(e.toString())}');
+    }
+    return null;
+
+  }
 
   getDataProduit() async {
-    List<dynamic> list = await getProdriut();
+    List<dynamic> list = await getProdriut(context);
     if(list != null){
       for(int i = 0; i< list.length; i++){
         _produits.add(list[i]);
         print(_produits[i]['code']);
+        setState(() {
+          isLoading1 = false;
+        });
+      }
+    }else{
+      print('Le retour est nul');
+    }
+
+
+  }
+
+  getDataPrix(String cycle) async {
+    carnet = await getCarnet(context, cycle);
+    if(carnet != null){
+      prixVenteCarnet = carnet['prixVente'];
+    }else{
+      print('Le retour est nul');
+    }
+
+
+  }
+
+  getDataCycle() async {
+    List<dynamic> list = await GetDataProvider().getCycle(context);
+    if(list != null){
+      for(int i = 0; i< list.length; i++){
+        _cycle.add(list[i]);
         setState(() {
           isLoading1 = false;
         });
@@ -82,6 +176,8 @@ class _SouscrireState extends State<Souscrire> {
     // TODO: implement initState
     getDataObjet();
     getDataProduit();
+    getDataCycle();
+
     super.initState();
   }
 
@@ -91,18 +187,14 @@ class _SouscrireState extends State<Souscrire> {
     super.setState(fn);
     _selectedItem=_selectedItem;
   }
+
   @override
   Widget build(BuildContext context) {
     // final Object? client = ModalRoute.of(context)?.settings.arguments;
     final Map client = ModalRoute.of(context)?.settings.arguments as Map;
 
-    print('les données renvoyées au fichier souscrire: $client');
-    AdresseE adres = AdresseE(adresse: "Libreville IAI", paysId: 27, codePostal: '2263', quartier: 'IAI', villeId: 31, telephone: client['personne']['adresse']['telephone'], email: client['personne']['adresse']['email']);
+    print(client);
 
-    PersonneE _personne = PersonneE(adresse: adres, resident: client['personne']['resident'], dateNaissance: DateTime.parse(client['personne']['dateNaissance']), paysResidence: client['personne']['paysResidence'], nationalite: client['personne']['nationalite'], civilite: client['personne']['civilite'], nom: client['personne']['nom'],  prenom: client['personne']['prenom'], sexe: client['personne']['sexe'], etatMatrimoniale: 'CELIBATAIRE');
-    ClientE _clt = ClientE(personne: _personne, gestionnaireId: 274,
-        typeClientId: 1041,);
-    _client = _clt;
     return Scaffold(
       appBar: AppBar(
         elevation: 00,
@@ -201,7 +293,6 @@ class _SouscrireState extends State<Souscrire> {
                         setState(() {
                           _selectionProduit = newValue;
                           data['produit'] = _selectionProduit;
-                          selected = true;
                         });
                       },
                       items:_produits
@@ -245,9 +336,39 @@ class _SouscrireState extends State<Souscrire> {
 
 
                 Container(
-                    padding: const EdgeInsets.only(left: 10),
-                    child: Text(selected?'Cycle':'')),
+                  height: 50,
+                  width: MediaQuery.of(context).size.width,
+                  margin: const EdgeInsets.all(10),
+                  child: DropdownButtonHideUnderline(
+                    child: GFDropdown(
+                      hint: const Text('Cycle'),
+                      padding: const EdgeInsets.only(left: 15, right: 5),
+                      borderRadius: BorderRadius.circular(10),
+                      border: const BorderSide(
+                          color: Colors.black12, width: 1),
+                      dropdownButtonColor: Colors.grey[100],
+                      value: _selected_cycle,
+                      onChanged: (newValue) {
+                        setState(() {
+                          _selected_cycle = newValue;
+                          carnet = getDataPrix(_selected_cycle['libelle']);
+                          selectedCycle = true;
 
+                        });
+                      },
+                      items:_cycle
+                          .map((value) => DropdownMenuItem(
+                        value: value,
+                        child: Text(value['libelle']),
+                      ))
+                          .toList(),
+                    ),
+                  ),
+                ),
+
+                Container(
+                    padding: const EdgeInsets.only(left: 10),
+                    child: Text(selectedCycle?'Prix carnet':'')),
                 Container(
                   height: 50,
                   width: MediaQuery.of(context).size.width,
@@ -264,7 +385,7 @@ class _SouscrireState extends State<Souscrire> {
                   child: TextField(
                       readOnly: true,
                       decoration: InputDecoration(
-                          hintText: !selected? 'Cycle': _selectionProduit['cycle'],
+                          hintText: prixVenteCarnet.toString(),
                         border: InputBorder.none
                       )
                   ),
@@ -412,9 +533,11 @@ class _SouscrireState extends State<Souscrire> {
                           minimumSize: const Size(125, 40), //////// HERE
 
                         ),
+
                         onPressed: () {
+                          client['produit']= _selectionProduit;
                           autreObjet.text == ''? _selectionObjet : _selectionObjet = autreObjet.value as Objet;
-                          data['objet'] = _selectionObjet.libelle;
+                          client['objet'] = _selectionObjet.libelle;
                           print('objet de la souscription : ${_selectionObjet.libelle}');
                           print('frequence de collecte: ${_selectionProduit['freqCollecte']['value']}');
                           print('cycle de collecte: ${_selectionProduit['cycle']}');
@@ -422,7 +545,9 @@ class _SouscrireState extends State<Souscrire> {
                           print('data: $data');
                           int montant = int.parse(mise.text);
                           print('print le montant: $montant');
-                          _dialogBuilder(context);
+                          client['mise'] = montant;
+                          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>const Otp(),
+                          settings: RouteSettings(arguments: client),));
                         },
                         icon: const Icon(Icons.save),  //icon data for elevated button
                         label: const Text("Valider", style: TextStyle(fontSize: 20),), //label text
@@ -441,102 +566,4 @@ class _SouscrireState extends State<Souscrire> {
 
   }
 
-  void popup(BuildContext context, int i){
-    print('le statut reçu $i');
-    if(i == 201){
-      AwesomeDialog(
-        context: context,
-        animType: AnimType.leftSlide,
-        headerAnimationLoop: false,
-        dialogType: DialogType.success,
-        showCloseIcon: true,
-        title: 'Succès',
-        desc: 'Soucription éffectuée avec succès!',
-        btnOkOnPress: () {
-          debugPrint('OnClcik');
-        },
-        btnOkIcon: Icons.check_circle,
-        onDismissCallback: (type) {
-          debugPrint('Dialog Dissmiss from callback $type');
-        },
-      ).show();
-      // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> const Photo()));
-
-    }else{
-      if(i==302)
-        {
-          AwesomeDialog(
-            context: context,
-            dialogType: DialogType.error,
-            animType: AnimType.rightSlide,
-            headerAnimationLoop: false,
-            title: 'Error',
-            desc:'Oops ce client existe déjà',
-            btnOkOnPress: () {},
-            btnOkIcon: Icons.cancel,
-            btnOkColor: Colors.red,
-          ).show();
-        }else{
-        AwesomeDialog(
-          context: context,
-          dialogType: DialogType.error,
-          animType: AnimType.rightSlide,
-          headerAnimationLoop: false,
-          title: 'Error',
-          desc:'Oops un problème est survenu dans la souscription de ce client',
-          btnOkOnPress: () {},
-          btnOkIcon: Icons.cancel,
-          btnOkColor: Colors.red,
-        ).show();
-      }
-
-    }
-    global.status = 0;
-  }
-
-
-  Future<void> _dialogBuilder(BuildContext context) {
-    return showDialog<void>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Validation', style: GoogleFonts.adamina(),),
-          content: Text('Voulez-vous vraiment persister ces données?', style: GoogleFonts.adamina(),),
-          actions: <Widget>[
-            TextButton(
-              style: TextButton.styleFrom(
-                textStyle: Theme.of(context).textTheme.labelLarge,
-              ),
-              child: const Text('Annuler'),
-              onPressed: () {
-                Navigator.of(context).pop();
-
-              },
-            ),
-            TextButton(
-              style: TextButton.styleFrom(
-                textStyle: Theme.of(context).textTheme.labelLarge,
-              ),
-              child: const Text('Valider', style: TextStyle(color: Color(0xff4a9e04)),),
-              onPressed: () {
-                setState(() async {
-                  ObjetSous _objetSous = ObjetSous(libelle: _selectionObjet.libelle,
-                    code: 1047,
-                    guid: "35c4cb51-0f41-4553-85bb-ee7b37d77011");
-                  print('mon double ${int.parse('40')}');
-                  int montant = int.parse(mise.text);
-                  String cycle = _selectionProduit['cycle'];
-                  var i = await postClientParticulier(_objetSous,_client, montant, cycle);
-                  popup(context, i!);
-                  Navigator.pop(context);
-
-                });
-
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
 }

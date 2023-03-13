@@ -4,6 +4,8 @@
 
 import 'dart:convert';
 
+import 'package:emf_tontine/data/models/client_morale_sous.dart';
+
 ClientMoraleSous clientMoraleSousFromMap(String str) => ClientMoraleSous.fromMap(json.decode(str));
 
 String clientMoraleSousToMap(ClientMoraleSous data) => json.encode(data.toMap());
@@ -23,8 +25,8 @@ class ClientMoraleSous {
 
   int montantMise;
   String cycleCarte;
-  ObjetSous objetSous;
-  Client client;
+  ObjetSousM objetSous;
+  ClientM client;
   String cInterneProduit;
   int produitId;
   int deviseId;
@@ -34,8 +36,8 @@ class ClientMoraleSous {
   factory ClientMoraleSous.fromMap(Map<String, dynamic> json) => ClientMoraleSous(
     montantMise: json["montantMise"],
     cycleCarte: json["cycleCarte"],
-    objetSous: ObjetSous.fromMap(json["objetSous"]),
-    client: Client.fromMap(json["client"]),
+    objetSous: ObjetSousM.fromMap(json["objetSous"]),
+    client: ClientM.fromMap(json["client"]),
     cInterneProduit: json["cInterneProduit"],
     produitId: json["produitId"],
     deviseId: json["deviseId"],
@@ -56,19 +58,19 @@ class ClientMoraleSous {
   };
 }
 
-class Client {
-  Client({
+class ClientM {
+  ClientM({
     required this.personne,
     required this.gestionnaireId,
     required this.typeClientId,
   });
 
-  Personne personne;
+  PersonneM personne;
   int gestionnaireId;
   int typeClientId;
 
-  factory Client.fromMap(Map<String, dynamic> json) => Client(
-    personne: Personne.fromMap(json["personne"]),
+  factory ClientM.fromMap(Map<String, dynamic> json) => ClientM(
+    personne: PersonneM.fromMap(json["personne"]),
     gestionnaireId: json["gestionnaireId"],
     typeClientId: json["typeClientId"],
   );
@@ -80,8 +82,8 @@ class Client {
   };
 }
 
-class Personne {
-  Personne({
+class PersonneM {
+  PersonneM({
     required this.adresse,
     required this.resident,
     required this.dateNaissance,
@@ -93,7 +95,7 @@ class Personne {
     required this.formeJuridique,
   });
 
-  Adresse adresse;
+  AdresseM adresse;
   bool resident;
   DateTime dateNaissance;
   String paysResidence;
@@ -103,8 +105,8 @@ class Personne {
   String nomGerant;
   String formeJuridique;
 
-  factory Personne.fromMap(Map<String, dynamic> json) => Personne(
-    adresse: Adresse.fromMap(json["adresse"]),
+  factory PersonneM.fromMap(Map<String, dynamic> json) => PersonneM(
+    adresse: AdresseM.fromMap(json["adresse"]),
     resident: json["resident"],
     dateNaissance: DateTime.parse(json["dateNaissance"]),
     paysResidence: json["paysResidence"],
@@ -128,8 +130,8 @@ class Personne {
   };
 }
 
-class Adresse {
-  Adresse({
+class AdresseM {
+  AdresseM({
     // required this.type,
     required this.adresse,
     required this.paysId,
@@ -149,7 +151,7 @@ class Adresse {
   String telephone;
   String email;
 
-  factory Adresse.fromMap(Map<String, dynamic> json) => Adresse(
+  factory AdresseM.fromMap(Map<String, dynamic> json) => AdresseM(
     // type: json["type"],
     adresse: json["adresse"],
     paysId: json["paysId"],
@@ -172,18 +174,19 @@ class Adresse {
   };
 }
 
-class ObjetSous {
-  ObjetSous({
-    required this.code,
-    required this.guid,
-    required this.libelle,
+
+class ObjetSousM {
+  ObjetSousM({
+    this.code = 1047,
+    this.guid = '35c4cb51-0f41-4553-85bb-ee7b37d77011',
+    this.libelle = 'Epargne Enfant',
   });
 
-  int code;
-  String guid;
-  String libelle;
+  int? code;
+  String? guid;
+  String? libelle;
 
-  factory ObjetSous.fromMap(Map<String, dynamic> json) => ObjetSous(
+  factory ObjetSousM.fromMap(Map<String, dynamic> json) => ObjetSousM(
     code: json["code"],
     guid: json["guid"],
     libelle: json["libelle"],
@@ -195,3 +198,6 @@ class ObjetSous {
     "libelle": libelle,
   };
 }
+
+
+

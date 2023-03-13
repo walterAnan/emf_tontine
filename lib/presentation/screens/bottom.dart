@@ -1,4 +1,5 @@
 
+import 'package:emf_tontine/presentation/screens/choix_client1.dart';
 import 'package:emf_tontine/presentation/screens/dashboard.dart';
 import 'package:emf_tontine/presentation/screens/profile.dart';
 import 'package:flutter/material.dart';
@@ -15,10 +16,11 @@ class Bottom extends StatefulWidget {
 class _BottomState extends State<Bottom> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
   int _selectedIndex = 0;
+
   static const TextStyle optionStyle = TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
   static  final List<Widget> _widgetOptions = <Widget>[
     const Dashboard(),
-    const Clients(),
+    const ChoixClient1(),
      const ProfileScreen()
   ];
 

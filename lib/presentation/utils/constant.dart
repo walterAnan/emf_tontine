@@ -8,3 +8,6 @@ class ProdConstante{
   final prod = "https://keycloakdev.ventis.group/";
 }
 
+class GlobalVariable{
+  dynamic retourImage;
+}

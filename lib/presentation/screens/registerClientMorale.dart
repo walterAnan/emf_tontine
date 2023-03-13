@@ -21,7 +21,7 @@ class _ClientMoralState extends State<ClientMoral> {
   final TextEditingController textEditingController = TextEditingController();
   final TextEditingController _date = TextEditingController();
   final TextEditingController _raisonSociale = TextEditingController();
-  final TextEditingController _formeJuridique = TextEditingController();
+  // final TextEditingController _formeJuridique = TextEditingController();
   final TextEditingController _nomRespo = TextEditingController();
   final TextEditingController _prenomRespo = TextEditingController();
   final TextEditingController _dateCreation =  TextEditingController();
@@ -47,6 +47,7 @@ class _ClientMoralState extends State<ClientMoral> {
   String? selectedValue;
 
   final List<dynamic> _list_pays = [];
+  final List<dynamic> forme_juridique = [];
   late final List<dynamic> _type_piece = [];
   final List<String> _etat_matrimonial = [];
   dynamic _selected_pays_residence;
@@ -55,6 +56,7 @@ class _ClientMoralState extends State<ClientMoral> {
   final List<dynamic> _profession =  [];
   dynamic selected_civilite;
   dynamic selected_ville;
+  dynamic _selected_forme_juridique;
 
   bool select= false;
   List<String> list = ['Pas de type de pièce'];
@@ -67,7 +69,7 @@ class _ClientMoralState extends State<ClientMoral> {
 
 
   getDataCivilite() async {
-    var list = await GetDataProvider().getCivilite();
+    var list = await GetDataProvider().getCivilite(context);
     if(list != null){
       for(int i = 0; i< list.length; i++){
         _civilite.add(list[i]);
@@ -85,7 +87,7 @@ class _ClientMoralState extends State<ClientMoral> {
 
 
   getDataVille() async {
-    var list = await GetDataProvider().getVille();
+    var list = await GetDataProvider().getVille(context);
     if(list != null){
       for(int i = 0; i< list.length; i++){
         _ville.add(list[i]);
@@ -103,9 +105,28 @@ class _ClientMoralState extends State<ClientMoral> {
   }
 
 
+  getDataFormeJuridique() async {
+    var list = await GetDataProvider().getFormeJuridique(context);
+    if(list != null){
+      for(int i = 0; i< list.length; i++){
+        forme_juridique.add(list[i]);
+        print(list[i]['libelle']);
+
+      }
+      setState(() {
+        isLoading = false;
+      });
+
+    }else{
+      print('Le retour est nul');
+    }
+
+  }
+
+
 
   getDataProfession() async {
-    var list = await GetDataProvider().getprofession();
+    var list = await GetDataProvider().getprofession(context);
     if(list != null){
       for(int i = 0; i< list.length; i++){
         _profession.add(list[i]);
@@ -124,7 +145,7 @@ class _ClientMoralState extends State<ClientMoral> {
 
   getDataTypePiece() async {
     isLoading2 = true;
-    var list = await GetDataProvider().getTypePiece();
+    var list = await GetDataProvider().getTypePiece(context);
     if(list != null){
       for(int i = 0; i< list.length; i++){
         print('les pieces');
@@ -143,7 +164,7 @@ class _ClientMoralState extends State<ClientMoral> {
   }
 
   getDataEtatMatri() async {
-    var list = await GetDataProvider().getEtatMatri();
+    var list = await GetDataProvider().getEtatMatri(context);
     if(list != null){
       for(int i = 0; i< list.length; i++){
         print(list[i]);
@@ -161,7 +182,7 @@ class _ClientMoralState extends State<ClientMoral> {
 
 
   getDataPays() async {
-    var list = await GetDataProvider().getPays();
+    var list = await GetDataProvider().getPays(context);
     if(list != null){
       for(int i = 0; i< list.length; i++){
         print('pays ${list[i]}');
@@ -184,6 +205,7 @@ class _ClientMoralState extends State<ClientMoral> {
       getDataTypePiece();
       getDataVille();
       getDataProfession();
+      getDataFormeJuridique();
 
     });
 
@@ -214,7 +236,7 @@ class _ClientMoralState extends State<ClientMoral> {
                 color: const Color(0xff4a9e04),
                 margin: const EdgeInsets.only(top: 50),
                 child: Text(
-                  'Enrollement d\'un client moral', style: GoogleFonts.adamina(
+                  'Enrolement d\'une entréprise', style: GoogleFonts.adamina(
                     fontSize: 19,
                   color: Colors.white
                 ),
@@ -255,23 +277,23 @@ class _ClientMoralState extends State<ClientMoral> {
                             });
                           }else{
                             dynamic clientMoral = {
-                              "adress": _quartier.text,
-                              "quarier": _quartier.text,
+                              "adress": selected_ville['nom']+ ', '+ _quartier.text,
+                              "quartier": _quartier.text,
                               "ville": selected_ville,
                               "telephone": _telephone.text,
                               "email": _adresseMail.text,
                               "resident": _estResident,
                               "dateCreation": _dateCreation.text,
-                              "paysResidence":_selected_pays_residence,
+                              "paysResidence":_selected_pays_residence.nom,
                               "nationalite": _nationalite.text,
                               "raisonSociale": _raisonSociale.text,
                               "nomRespon":_nomRespo.text,
                               "prenomRespon":_prenomRespo.text,
-                              "formeJuridique":_formeJuridique.text
+                              "formeJuridique":_selected_forme_juridique
 
                             };
 
-                            print('les infos du client mora: $clientMoral');
+                            print('les infos du client moral: $clientMoral');
                             Navigator.push(context, MaterialPageRoute(builder: (context)=> const SouscrireM(),
                                 settings: RouteSettings(arguments: clientMoral)));
                           }
@@ -356,19 +378,36 @@ class _ClientMoralState extends State<ClientMoral> {
                                     ),
                                     const SizedBox(height: 5,),
 
-                                    TextFormField(
-                                      controller: _formeJuridique,
-                                      decoration: const InputDecoration(
-                                        labelText: 'Forme juridique',
+
+                                    Container(
+                                      height: 50,
+                                      width: MediaQuery.of(context).size.width,
+                                      margin: const EdgeInsets.all(5),
+                                      child: DropdownButtonHideUnderline(
+                                        child: GFDropdown(
+                                          hint: const Text('Forme Juridique'),
+                                          padding: const EdgeInsets.only(left: 15, right: 5),
+                                          borderRadius: BorderRadius.circular(10),
+                                          border: const BorderSide(
+                                              color: Colors.black12, width: 1),
+                                          dropdownButtonColor: Colors.grey[100],
+                                          value: _selected_forme_juridique,
+                                          onChanged: (newValue) {
+                                            setState(() {
+                                              _selected_forme_juridique = newValue;
+                                            });
+                                          },
+                                          items:forme_juridique
+                                              .map((value) => DropdownMenuItem(
+                                            value: value,
+                                            child: forme_juridique.isEmpty? const Text('pas de forme juridique disponible') : Text(value['value']),
+                                          ))
+                                              .toList(),
+                                        ),
                                       ),
-                                      // The validator receives the text that the user has entered.
-                                      validator: (value) {
-                                        if (value == null || value.isEmpty) {
-                                          return 'Entrer la forme juridique';
-                                        }
-                                        return null;
-                                      },
                                     ),
+
+
                                     const SizedBox(height: 5,),
                                     // TextFormField(
                                     //   decoration: const InputDecoration(
